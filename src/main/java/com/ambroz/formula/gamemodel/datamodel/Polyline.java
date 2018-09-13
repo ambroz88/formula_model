@@ -3,10 +3,10 @@ package com.ambroz.formula.gamemodel.datamodel;
 import com.ambroz.formula.gamemodel.utils.Calc;
 
 /**
- * This class <code>polyline</code> represent <code>ArrayList</code> of <code>points</code>. It
- * could means line or just separate point which hasn't any order in <code>Arraylist</code>.
+ * This class <code>polyline</code> represent <code>ArrayList</code> of <code>points</code>. It could means line or just
+ * separate point which hasn't any order in <code>Arraylist</code>.
  *
- * @author Jiri Ambroz
+ * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
 public class Polyline extends Segment {
 
@@ -44,8 +44,8 @@ public class Polyline extends Segment {
     }
 
     /**
-     * This method inserts <code>point p</code> on certain position.Rest of the points will move
-     * over one position closer to the end.
+     * This method inserts <code>point p</code> on certain position.Rest of the points will move over one position
+     * closer to the end.
      *
      * @param p is point which we want to add
      * @param pos is position in <code>polyline</code> where we want to add the point.
@@ -55,8 +55,8 @@ public class Polyline extends Segment {
     }
 
     /**
-     * This method overwrite point on position <code>pos</code> in this polyline with new
-     * <code>point p</code>. Point whis is on position <code>pos</code> will be delete.
+     * This method overwrite point on position <code>pos</code> in this polyline with new <code>point p</code>. Point
+     * whis is on position <code>pos</code> will be delete.
      *
      * @param p is new point which we want to add to
      * @param pos is position where the point will be insert
@@ -138,8 +138,7 @@ public class Polyline extends Segment {
     }
 
     /**
-     * This method makes opposite order of points in polyline. First point in polyline become the
-     * last etc.
+     * This method makes opposite order of points in polyline. First point in polyline become the last etc.
      *
      * @return new polyline with opposite points order
      */
@@ -152,8 +151,8 @@ public class Polyline extends Segment {
     }
 
     /**
-     * This method controls if segment <code>Polyline line.last()</code> and Point click crosses or
-     * touches any of the rest of segment in line.
+     * This method controls if segment <code>Polyline line.last()</code> and Point click crosses or touches any of the
+     * rest of segment in line.
      *
      * @param click point where the track will be constructed
      * @return true if there is a colision
@@ -175,8 +174,8 @@ public class Polyline extends Segment {
     }
 
     /**
-     * This method controls if segment <code>line</code> and Point click crosses or touches any of
-     * the rest of segment in line.
+     * This method controls if segment <code>line</code> and Point click crosses or touches any of the rest of segment
+     * in line.
      *
      * @param last last point of line which is constructed
      * @param click point where the track will be constructed

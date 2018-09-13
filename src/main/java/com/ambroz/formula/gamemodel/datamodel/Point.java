@@ -1,11 +1,11 @@
 package com.ambroz.formula.gamemodel.datamodel;
 
 /**
- * This class represent one point given by coordinate X and Y. The point has also information about
- * his position to track. It is good for special cases
+ * This class represent one point given by coordinate X and Y. The point has also information about his position to
+ * track. It is good for special cases
  * <b>e.g.</b> position on FINISH line.
  *
- * @author Jiri Ambroz
+ * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
 public class Point {
 

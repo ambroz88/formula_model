@@ -7,7 +7,7 @@ import com.ambroz.formula.gamemodel.utils.Calc;
 
 /**
  *
- * @author Jiri Ambroz
+ * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
 public class TrackEditor extends Track {
 
@@ -18,11 +18,9 @@ public class TrackEditor extends Track {
     }
 
     /**
-     * It finds out which point will be moved, resp it's side and position.
-     * Start and finish can't be moved.
+     * It finds out which point will be moved, resp it's side and position. Start and finish can't be moved.
      *
-     * @param click is point where user clicked - potentional point that will be
-     * moved
+     * @param click is point where user clicked - potential point that will be moved
      * @return true if the point is part of the track
      */
     public boolean clickOnTrack(Point click) {
@@ -49,12 +47,11 @@ public class TrackEditor extends Track {
     }
 
     /**
-     * It validates if user moves the point in correct position so newly created
-     * segments don't have intersect with any other segments.
+     * It validates if user moves the point in correct position so newly created segments don't have intersect with any
+     * other segments.
      *
      * @param click is point where user placed certain point of the track
-     * @return true if there is no intersection with the rest of the track,
-     * false otherwise
+     * @return true if there is no intersection with the rest of the track, false otherwise
      */
     public boolean isNewPointValid(Point click) {
         Point newEdgeStart = getLine(side).getPoint(movePointIndex - 1);

@@ -3,11 +3,13 @@ package com.ambroz.formula.gamemodel.datamodel;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ambroz.formula.gamemodel.utils.PropertyChanger;
+
 /**
  *
- * @author Jiri Ambroz
+ * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
-public class Segment {
+public class Segment extends PropertyChanger {
 
     protected List<Point> points;
 
@@ -46,8 +48,7 @@ public class Segment {
     }
 
     /**
-     * Method for counting coordinates of point in the middle of the first and last point in this
-     * polyline.
+     * Method for counting coordinates of point in the middle of the first and last point in this polyline.
      *
      * @return point in the middle of polyline
      */

@@ -1,17 +1,16 @@
 package com.ambroz.formula.gamemodel.datamodel;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ambroz.formula.gamemodel.utils.PropertyChanger;
+
 /**
  *
- * @author Jiri Ambroz
+ * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
-public class Paper {
+public class Paper extends PropertyChanger {
 
-    private final PropertyChangeSupport prop;
     private List<Segment> horizontal;
     private List<Segment> vertical;
     private int gridSize;
@@ -25,7 +24,6 @@ public class Paper {
         this.width = 90;
         this.height = 50;
         gridSize = 15;
-        prop = new PropertyChangeSupport(this);
         updateGrid();
     }
 
@@ -115,18 +113,6 @@ public class Paper {
 
     public List<Segment> getVerticalLines() {
         return vertical;
-    }
-
-    public void firePropertyChange(String prop, Object oldValue, Object newValue) {
-        this.prop.firePropertyChange(prop, oldValue, newValue);
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        prop.addPropertyChangeListener(listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        prop.removePropertyChangeListener(listener);
     }
 
 }

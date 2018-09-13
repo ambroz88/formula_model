@@ -47,7 +47,7 @@ public class TurnMaker {
                 act.addPoint(click);
                 act.movesUp();
                 if (selectedTurn.getPoint().getLocation().contains(Point.FINISH)
-                        && Track.LEFT == Calc.sidePosition(click, model.getTrack().getFinish())) {
+                        && Track.LEFT == Calc.sidePosition(click, model.getRaceTrack().getFinish())) {
                     act.lengthUp(act.getPreLast(), selectedTurn.getCollision());
                     act.setWin(true);
                 }
@@ -303,7 +303,7 @@ public class TurnMaker {
      */
     private void divideTurns(Point rivalLast) {
         Formula act = racers.get(1);
-        Track track = model.getTrack();
+        Track track = model.getRaceTrack();
         Polyline left = track.getLeft();
         Polyline right = track.getRight();
         for (int i = 0; i < turns.getSize(); i++) {

@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  *
- * @author Jiri Ambroz
+ * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
 public class Turns {
 

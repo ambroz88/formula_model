@@ -4,30 +4,25 @@ import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Track;
 import com.ambroz.formula.gamemodel.track.TrackBuilder;
+import static com.ambroz.formula.gamemodel.track.TrackBuilder.BUILD_LEFT;
 import com.ambroz.formula.gamemodel.turns.TurnMaker;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
+import com.ambroz.formula.gamemodel.utils.PropertyChanger;
 
 /**
  *
  * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
-public class GameModel {
+public class GameModel extends PropertyChanger {
 
-    public final static int BUILD_LEFT = 1;
-    public final static int BUILD_RIGHT = 2;
-    public final static int EDIT_PRESS = 3;
-    public final static int EDIT_RELEASE = 4;
-    public final static int FIRST_TURN = 5;
-    public final static int NORMAL_TURN = 6;
-    public final static int AUTO_CRASH = 7;
-    public final static int AUTO_FINISH = 8;
-    public final static int GAME_OVER = 9;
+    public static final int FIRST_TURN = 5;
+    public static final int NORMAL_TURN = 6;
+    public static final int AUTO_CRASH = 7;
+    public static final int AUTO_FINISH = 8;
+    public static final int GAME_OVER = 9;
 
     private final Paper paper;
     private final TurnMaker turnMaker;
     private final TrackBuilder trackBuilder;
-    private final PropertyChangeSupport prop;
 
     private Track track;
     private String language;
@@ -38,7 +33,6 @@ public class GameModel {
         turnMaker = new TurnMaker(this);
         track = new Track();
         trackBuilder = new TrackBuilder(this);
-        prop = new PropertyChangeSupport(this);
     }
 
     public void moveWithPlayer(Point click) {
@@ -50,12 +44,6 @@ public class GameModel {
                 turnMaker.firstTurn(click);
             } else if (getStage() > FIRST_TURN) {
                 turnMaker.turn(click);
-            } else if (getStage() == BUILD_LEFT) {
-                getTrackBuilder().buildTrack(click, Track.LEFT);
-//                fireHint(getTrackBuilder().getMessage());
-            } else if (getStage() == BUILD_RIGHT) {
-                getTrackBuilder().buildTrack(click, Track.RIGHT);
-//                fireHint(getTrackBuilder().getMessage());
             }
 
             checkWinner();
@@ -86,6 +74,13 @@ public class GameModel {
         resetPlayers();
     }
 
+    public void endGame() {
+        setStage(BUILD_LEFT);
+        firePropertyChange("buildTrack", false, true); // cought by TrackMenu
+        firePropertyChange("startDraw", false, true); // cought by TrackMenu and Draw
+        resetPlayers();
+    }
+
     /**
      * Method for clearing formulas and points.
      */
@@ -93,7 +88,7 @@ public class GameModel {
         turnMaker.getFormula(1).reset();
         turnMaker.resetTurns();
 
-        turnMaker.startPosition(getTrack().getStart());
+        turnMaker.startPosition(getRaceTrack().getStart());
         repaintScene();
     }
 
@@ -125,7 +120,7 @@ public class GameModel {
         return turnMaker;
     }
 
-    public Track getTrack() {
+    public Track getRaceTrack() {
         return track;
     }
 
@@ -139,8 +134,9 @@ public class GameModel {
 
     public void setLanguage(String language) {
         this.language = language;
+        getTrackBuilder().setLanguage(language);
 //        hintLabels = new HintLabels(language);
-        prop.firePropertyChange("language", null, language);
+        firePropertyChange("language", null, language);
     }
 
     public int getStage() {
@@ -154,18 +150,6 @@ public class GameModel {
     public void fireLoadTrack() {
         //cought by TracksComponent
         firePropertyChange("loadTrack", false, true);
-    }
-
-    public void firePropertyChange(String prop, Object oldValue, Object newValue) {
-        this.prop.firePropertyChange(prop, oldValue, newValue);
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        prop.addPropertyChangeListener(listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        prop.removePropertyChangeListener(listener);
     }
 
 }

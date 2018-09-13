@@ -1,15 +1,12 @@
 package com.ambroz.formula.gamemodel.datamodel;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-
 import com.ambroz.formula.gamemodel.enums.FormulaType;
 
 /**
- * This class represents formula. It is polyline which has some special functions and variables. In
- * drawing this polyline has the arrows in each point so it looks like a vector.
+ * This class represents formula. It is polyline which has some special functions and variables. In drawing this
+ * polyline has the arrows in each point so it looks like a vector.
  *
- * @author Jiri Ambroz
+ * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
 public class Formula extends Polyline {
 
@@ -23,7 +20,6 @@ public class Formula extends Polyline {
     private String name;
     private double length; //actual distance which formula took
     private boolean winner;//is true when this formula finished the race
-    private final PropertyChangeSupport prop;
 
     public Formula(FormulaType formulaType) {
         super();
@@ -34,7 +30,6 @@ public class Formula extends Polyline {
         length = 1;
         wait = 0;
         type = formulaType;
-        prop = new PropertyChangeSupport(this); //every fire is cought by StatisticPanel
     }
 
     /**
@@ -46,7 +41,7 @@ public class Formula extends Polyline {
         moves = 1;
         length = 1;
         wait = 0;
-        prop.firePropertyChange("reset", false, true);
+        firePropertyChange("reset", false, true);
     }
 
     @Override
@@ -69,7 +64,7 @@ public class Formula extends Polyline {
     public void setColor(int color) {
         int old = getColor();
         this.rgbColor = color;
-        prop.firePropertyChange("color", old, color); //caught by PlayerPanel and Statistic panel
+        firePropertyChange("color", old, color); //caught by PlayerPanel and Statistic panel
     }
 
     public String getName() {
@@ -79,7 +74,7 @@ public class Formula extends Polyline {
     public void setName(String name) {
         String old = getName();
         this.name = name;
-        prop.firePropertyChange("name", old, name);
+        firePropertyChange("name", old, name);
     }
 
     public void setSpeed(int speed) {
@@ -99,8 +94,7 @@ public class Formula extends Polyline {
     }
 
     /**
-     * This method counts the size of vertical movement of this formula if it goes to
-     * <code>point turn</code>.
+     * This method counts the size of vertical movement of this formula if it goes to <code>point turn</code>.
      *
      * @param turn is point where the formula is going
      * @return number of grid squeres
@@ -118,8 +112,7 @@ public class Formula extends Polyline {
     }
 
     /**
-     * This method counts the size of horizontal movement of this formula if it goes to
-     * <code>point turn</code>.
+     * This method counts the size of horizontal movement of this formula if it goes to <code>point turn</code>.
      *
      * @param turn is point where the formula is going
      * @return number of grid squeres
@@ -143,8 +136,7 @@ public class Formula extends Polyline {
     }
 
     /**
-     * This method counts the maximum movement size of this formula if it goes to
-     * <code>point click</code>.
+     * This method counts the maximum movement size of this formula if it goes to <code>point click</code>.
      *
      * @param click is point where the formula is going
      * @return number of grid squeres
@@ -160,8 +152,7 @@ public class Formula extends Polyline {
     }
 
     /**
-     * This method counts the minimum movement size of this formula if it goes to
-     * <code>point click</code>.
+     * This method counts the minimum movement size of this formula if it goes to <code>point click</code>.
      *
      * @param click is point where the formula is going
      * @return number of grid squeres
@@ -177,8 +168,8 @@ public class Formula extends Polyline {
     }
 
     /**
-     * This method finds out which movement direction would be more dominant if this formula would
-     * move to <code>point click</code>. If it is horizontal or vertical movement.
+     * This method finds out which movement direction would be more dominant if this formula would move to
+     * <code>point click</code>. If it is horizontal or vertical movement.
      *
      * @param click is possible movement point
      * @return String with dominant direction
@@ -217,7 +208,7 @@ public class Formula extends Polyline {
     public void setWait(int wait) {
         int old = getWait();
         this.wait = wait;
-        prop.firePropertyChange("stop", old, wait);
+        firePropertyChange("stop", old, wait);
     }
 
     public int getWait() {
@@ -226,12 +217,12 @@ public class Formula extends Polyline {
 
     public void movesUp() {
         moves++;
-        prop.firePropertyChange("move", 0, moves);
+        firePropertyChange("move", 0, moves);
     }
 
     public void movesUp(int count) {
         moves = moves + count;
-        prop.firePropertyChange("move", 0, moves);
+        firePropertyChange("move", 0, moves);
     }
 
     public int getMoves() {
@@ -248,12 +239,12 @@ public class Formula extends Polyline {
         double dist = Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2)
                 + Math.pow(p2.getY() - p1.getY(), 2));
         length = length + Math.round(dist * 100.0) / 100.0;
-        prop.firePropertyChange("dist", 0, length);
+        firePropertyChange("dist", 0, length);
     }
 
     /**
-     * This method updates the distance of the formula about the distance between
-     * <code>point p1</code> and <code>point p2</code>. Distance is rounded to 2 decimals.
+     * This method updates the distance of the formula about the distance between <code>point p1</code> and
+     * <code>point p2</code>. Distance is rounded to 2 decimals.
      *
      * @param p1 first point
      * @param p2 second point
@@ -262,19 +253,11 @@ public class Formula extends Polyline {
         double dist = Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2)
                 + Math.pow(p2.getY() - p1.getY(), 2));
         length = Math.round((length + dist) * 100.0) / 100.0;
-        prop.firePropertyChange("dist", 0, length);
+        firePropertyChange("dist", 0, length);
     }
 
     public double getDist() {
         return length;
-    }
-
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        prop.addPropertyChangeListener(listener);
-    }
-
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        prop.removePropertyChangeListener(listener);
     }
 
 }

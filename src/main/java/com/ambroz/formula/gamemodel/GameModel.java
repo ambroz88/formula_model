@@ -3,6 +3,7 @@ package com.ambroz.formula.gamemodel;
 import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Track;
+import com.ambroz.formula.gamemodel.track.TrackBuilder;
 import com.ambroz.formula.gamemodel.turns.TurnMaker;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -25,6 +26,7 @@ public class GameModel {
 
     private final Paper paper;
     private final TurnMaker turnMaker;
+    private final TrackBuilder trackBuilder;
     private final PropertyChangeSupport prop;
 
     private Track track;
@@ -35,6 +37,7 @@ public class GameModel {
         paper = new Paper();
         turnMaker = new TurnMaker(this);
         track = new Track();
+        trackBuilder = new TrackBuilder(this);
         prop = new PropertyChangeSupport(this);
     }
 
@@ -47,6 +50,12 @@ public class GameModel {
                 turnMaker.firstTurn(click);
             } else if (getStage() > FIRST_TURN) {
                 turnMaker.turn(click);
+            } else if (getStage() == BUILD_LEFT) {
+                getTrackBuilder().buildTrack(click, Track.LEFT);
+//                fireHint(getTrackBuilder().getMessage());
+            } else if (getStage() == BUILD_RIGHT) {
+                getTrackBuilder().buildTrack(click, Track.RIGHT);
+//                fireHint(getTrackBuilder().getMessage());
             }
 
             checkWinner();
@@ -88,13 +97,28 @@ public class GameModel {
         repaintScene();
     }
 
-    private void repaintScene() {
+    public void fireTrackReady(boolean ready) {
+        // cought by StartMenu, TrackMenu
+        firePropertyChange("startVisible", !ready, ready);
+        if (ready) {
+//            fireHint(HintLabels.TRACK_READY);
+            repaintScene();
+        } else {
+//            fireHint(HintLabels.EMPTY);
+        }
+    }
+
+    public void repaintScene() {
         //cought by Draw
         firePropertyChange("repaint", false, true);
     }
 
     public Paper getPaper() {
         return paper;
+    }
+
+    public TrackBuilder getTrackBuilder() {
+        return trackBuilder;
     }
 
     public TurnMaker getTurnMaker() {

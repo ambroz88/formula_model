@@ -1,10 +1,11 @@
 package com.ambroz.formula.gamemodel;
 
+import static com.ambroz.formula.gamemodel.track.TrackBuilder.BUILD_LEFT;
+
 import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Track;
 import com.ambroz.formula.gamemodel.track.TrackBuilder;
-import static com.ambroz.formula.gamemodel.track.TrackBuilder.BUILD_LEFT;
 import com.ambroz.formula.gamemodel.turns.TurnMaker;
 import com.ambroz.formula.gamemodel.utils.PropertyChanger;
 

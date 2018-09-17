@@ -47,6 +47,7 @@ public class TrackBuilder extends TrackEditor {
         paper.setGridSize(15);
         paper.setHeight(DIMENSION);
         paper.setWidth(DIMENSION);
+        System.out.println("TrackBuilder: " + hashCode());
     }
 
     /**
@@ -56,10 +57,13 @@ public class TrackBuilder extends TrackEditor {
      * @param click is point where user clicked.
      */
     public void buildTrack(Point click) {
-        this.side = getStage();
+        click.toGridUnits(getPaper().getGridSize());
+
         if (BUILD_LEFT == side) {
+            side = Track.LEFT;
             oppSide = Track.RIGHT;
         } else {
+            side = Track.RIGHT;
             oppSide = Track.LEFT;
         }
         Polyline actLine = getLine(side);
@@ -88,25 +92,25 @@ public class TrackBuilder extends TrackEditor {
                 getModel().fireTrackReady(ready);
             }
         } else //OPPOSITE SIDE WASN'T STILL STARTED
-         if (actLine.getLength() <= 1) {
-                //create start
-                if (actLine.isEmpty()) {
-                    getPoints().addPoint(click); //first point in side is drawn
-                }
-                addPoint(side, click);
-            } else if (!actLine.getLast().isEqual(click)) {
-                //point click is not identical with the last point in builded side
-                if (!actLine.checkOwnCrossing(click)) {
-                    //new edge of builded side don't cross any other edge
-                    if (correctDirection(actLine, click)) {
-                        addPoint(side, click);
-                    }
-                } else {
-                    message = HintLabels.CROSSING;
+        if (actLine.getLength() <= 1) {
+            //create start
+            if (actLine.isEmpty()) {
+                getPoints().addPoint(click); //first point in side is drawn
+            }
+            addPoint(side, click);
+        } else if (!actLine.getLast().isEqual(click)) {
+            //point click is not identical with the last point in builded side
+            if (!actLine.checkOwnCrossing(click)) {
+                //new edge of builded side don't cross any other edge
+                if (correctDirection(actLine, click)) {
+                    addPoint(side, click);
                 }
             } else {
-                message = HintLabels.IDENTICAL_POINTS;
+                message = HintLabels.CROSSING;
             }
+        } else {
+            message = HintLabels.IDENTICAL_POINTS;
+        }
 
         repaintScene();
     }
@@ -251,16 +255,16 @@ public class TrackBuilder extends TrackEditor {
         }
     }
 
-    public void deletePoint(int actSide, int oppSide) {
+    public void deletePoint() {
         //mazani poslednich bodu pri tvorbe trati - podle toho, jaka se krajnice vybrana
-        int actSize = getLine(actSide).getLength();
+        int actSize = getLine(side).getLength();
         int oppSize = getLine(oppSide).getLength();
 
         if (actSize > 0) {
-            removeLast(actSide);
+            removeLast(side);
             //kdyz zbyde v krajnici pouze jeden bod, tak bude vykreslen
             if (actSize == 1) {
-                getPoints().addPoint(getLine(actSide).getLast());
+                getPoints().addPoint(getLine(side).getLast());
             } else if (actSize == 0) {
                 //kdyz se smaze i posledni bod, smaze se take tecka znacici prvni bod
                 getPoints().clear();
@@ -315,16 +319,16 @@ public class TrackBuilder extends TrackEditor {
     public boolean memorizeTrackPoint(Point click) {
         boolean onTrack = false;
         if (getStage() == EDIT_PRESS) {
-
             click.toGridUnits(getPaper().getGridSize());
+
             onTrack = clickOnTrack(click);
             if (!onTrack) {
 //                fireHint(HintLabels.NO_POINT);
             } else {
 //                fireHint(HintLabels.EMPTY);
+                setStage(EDIT_RELEASE);
+                repaintScene();
             }
-            setStage(EDIT_RELEASE);
-            repaintScene();
         }
 
         return onTrack;

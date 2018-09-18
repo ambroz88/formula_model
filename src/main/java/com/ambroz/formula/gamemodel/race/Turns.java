@@ -1,4 +1,6 @@
-package com.ambroz.formula.gamemodel.datamodel;
+package com.ambroz.formula.gamemodel.race;
+
+import com.ambroz.formula.gamemodel.datamodel.Point;
 
 import java.util.ArrayList;
 import java.util.List;

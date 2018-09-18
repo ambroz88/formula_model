@@ -11,7 +11,8 @@ import java.util.logging.Logger;
 
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
-import com.ambroz.formula.gamemodel.datamodel.Track;
+import com.ambroz.formula.gamemodel.track.Track;
+
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;

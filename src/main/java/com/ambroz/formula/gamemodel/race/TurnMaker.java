@@ -1,17 +1,15 @@
-package com.ambroz.formula.gamemodel.turns;
+package com.ambroz.formula.gamemodel.race;
 
-import com.ambroz.formula.gamemodel.GameModel;
-import com.ambroz.formula.gamemodel.datamodel.Formula;
-import com.ambroz.formula.gamemodel.datamodel.Point;
-import com.ambroz.formula.gamemodel.datamodel.Polyline;
-import com.ambroz.formula.gamemodel.datamodel.Segment;
-import com.ambroz.formula.gamemodel.datamodel.Track;
-import com.ambroz.formula.gamemodel.datamodel.Turns;
-import com.ambroz.formula.gamemodel.enums.FormulaType;
-import com.ambroz.formula.gamemodel.utils.Calc;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.List;
+
+import com.ambroz.formula.gamemodel.datamodel.Point;
+import com.ambroz.formula.gamemodel.datamodel.Polyline;
+import com.ambroz.formula.gamemodel.datamodel.Segment;
+import com.ambroz.formula.gamemodel.enums.FormulaType;
+import com.ambroz.formula.gamemodel.track.Track;
+import com.ambroz.formula.gamemodel.utils.Calc;
 
 /**
  *
@@ -23,12 +21,12 @@ public class TurnMaker {
     public static final int FIVE_TURNS = 5;
     public static final int NINE_TURNS = 9;
 
-    private final GameModel model;
+    private final RaceModel model;
     private final HashMap<Integer, Formula> racers;
     private Turns turns;
     private int turnsCount;
 
-    public TurnMaker(GameModel menu) {
+    public TurnMaker(RaceModel menu) {
         this.model = menu;
         racers = new HashMap<>();
         racers.put(1, new Formula(FormulaType.Player));
@@ -47,7 +45,7 @@ public class TurnMaker {
                 act.addPoint(click);
                 act.movesUp();
                 if (selectedTurn.getPoint().getLocation().contains(Point.FINISH)
-                        && Track.LEFT == Calc.sidePosition(click, model.getRaceTrack().getFinish())) {
+                        && Track.LEFT == Calc.sidePosition(click, model.getTrack().getFinish())) {
                     act.lengthUp(act.getPreLast(), selectedTurn.getCollision());
                     act.setWin(true);
                 }
@@ -77,7 +75,7 @@ public class TurnMaker {
             act.addPoint(new Point(click.x + act.getSide(), click.y + act.getSpeed()));
 
             nextTurn(1, act.getLast());
-            model.setStage(GameModel.NORMAL_TURN);
+            model.setStage(RaceModel.NORMAL_TURN);
 
         }
     }
@@ -142,8 +140,7 @@ public class TurnMaker {
     /**
      * It creates possibilities of turns of next player.
      *
-     * @param formOnTurn number of formula for which possibilities will be
-     * created
+     * @param formOnTurn number of formula for which possibilities will be created
      * @param rivalLast last point of other player
      */
     public void nextTurn(int formOnTurn, Point rivalLast) {
@@ -221,10 +218,9 @@ public class TurnMaker {
     }
 
     /**
-     * Metoda najde novy stred po havarii a vykresli nove moznosti novy stred je
-     * prunikem kolmice kolizni hrany a kruznice se stredem v miste kolize a
-     * polomerem 0.6*velikost mrizky, pricemz bod musi lezet na trati colision
-     * je bod, ve kterem doslo k vyjeti z trati.
+     * Metoda najde novy stred po havarii a vykresli nove moznosti novy stred je prunikem kolmice kolizni hrany a
+     * kruznice se stredem v miste kolize a polomerem 0.6*velikost mrizky, pricemz bod musi lezet na trati colision je
+     * bod, ve kterem doslo k vyjeti z trati.
      */
     private void crashTurn() {
         Formula act = racers.get(1);
@@ -295,15 +291,14 @@ public class TurnMaker {
     }
 
     /**
-     * It devides possible turns into "clean" and "dirty". Dirty turn means
-     * formula crashed. In case that one possible turn is equal to rival
-     * position, that turns is not allowed.
+     * It devides possible turns into "clean" and "dirty". Dirty turn means formula crashed. In case that one possible
+     * turn is equal to rival position, that turns is not allowed.
      *
      * @param rivalLast is position of rival formula
      */
     private void divideTurns(Point rivalLast) {
         Formula act = racers.get(1);
-        Track track = model.getRaceTrack();
+        Track track = model.getTrack();
         Polyline left = track.getLeft();
         Polyline right = track.getRight();
         for (int i = 0; i < turns.getSize(); i++) {

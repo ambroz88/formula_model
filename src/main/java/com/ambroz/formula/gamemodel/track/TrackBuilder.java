@@ -2,12 +2,10 @@ package com.ambroz.formula.gamemodel.track;
 
 import java.io.IOException;
 
-import com.ambroz.formula.gamemodel.GameModel;
 import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
-import com.ambroz.formula.gamemodel.datamodel.Track;
 import com.ambroz.formula.gamemodel.labels.HintLabels;
 import com.ambroz.formula.gamemodel.utils.Calc;
 import com.ambroz.formula.gamemodel.utils.TrackIO;
@@ -27,17 +25,16 @@ public class TrackBuilder extends TrackEditor {
     public static final int EDIT_PRESS = 3;
     public static final int EDIT_RELEASE = 4;
 
-    private final GameModel model;
-    private Paper paper;
     private int side;
     private int oppSide;
+    private Paper paper;
     private int stage;
-    private Polyline points;
-    private String message;
     private String language;
 
-    public TrackBuilder(GameModel gModel) {
-        this.model = gModel;
+    private Polyline points;
+    private String message;
+
+    public TrackBuilder() {
         points = new Polyline();
         initPaper();
     }
@@ -89,28 +86,28 @@ public class TrackBuilder extends TrackEditor {
                 if (ready) {
                     finishIndexes();
                 }
-                getModel().fireTrackReady(ready);
+//                fireTrackReady(ready);
             }
         } else //OPPOSITE SIDE WASN'T STILL STARTED
-        if (actLine.getLength() <= 1) {
-            //create start
-            if (actLine.isEmpty()) {
-                getPoints().addPoint(click); //first point in side is drawn
-            }
-            addPoint(side, click);
-        } else if (!actLine.getLast().isEqual(click)) {
-            //point click is not identical with the last point in builded side
-            if (!actLine.checkOwnCrossing(click)) {
-                //new edge of builded side don't cross any other edge
-                if (correctDirection(actLine, click)) {
-                    addPoint(side, click);
+         if (actLine.getLength() <= 1) {
+                //create start
+                if (actLine.isEmpty()) {
+                    getPoints().addPoint(click); //first point in side is drawn
+                }
+                addPoint(side, click);
+            } else if (!actLine.getLast().isEqual(click)) {
+                //point click is not identical with the last point in builded side
+                if (!actLine.checkOwnCrossing(click)) {
+                    //new edge of builded side don't cross any other edge
+                    if (correctDirection(actLine, click)) {
+                        addPoint(side, click);
+                    }
+                } else {
+                    message = HintLabels.CROSSING;
                 }
             } else {
-                message = HintLabels.CROSSING;
+                message = HintLabels.IDENTICAL_POINTS;
             }
-        } else {
-            message = HintLabels.IDENTICAL_POINTS;
-        }
 
         repaintScene();
     }
@@ -282,10 +279,10 @@ public class TrackBuilder extends TrackEditor {
         if (!getLine(side).isEmpty()) {
             boolean ready = isReady() && getPoints().contains(getLine(side).getLast());
             if (ready) {
-                getModel().fireTrackReady(ready);
+//                fireTrackReady(ready);
             }
         }
-        getModel().repaintScene();
+        repaintScene();
     }
 
     public void startBuild(int side) {
@@ -375,10 +372,6 @@ public class TrackBuilder extends TrackEditor {
     public void reset() {
         super.reset();
         getPoints().clear();
-    }
-
-    public GameModel getModel() {
-        return model;
     }
 
     public Paper getPaper() {

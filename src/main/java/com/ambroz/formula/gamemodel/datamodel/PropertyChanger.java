@@ -1,4 +1,4 @@
-package com.ambroz.formula.gamemodel.utils;
+package com.ambroz.formula.gamemodel.datamodel;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

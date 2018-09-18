@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
-import com.ambroz.formula.gamemodel.datamodel.Track;
-import com.ambroz.formula.gamemodel.datamodel.Turns;
+import com.ambroz.formula.gamemodel.track.Track;
+import com.ambroz.formula.gamemodel.race.Turns;
 
 /**
  * This is a class with different matematical operations and methods which are static.

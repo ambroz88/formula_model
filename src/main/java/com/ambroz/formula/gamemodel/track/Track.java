@@ -1,7 +1,10 @@
-package com.ambroz.formula.gamemodel.datamodel;
+package com.ambroz.formula.gamemodel.track;
 
+import com.ambroz.formula.gamemodel.datamodel.Point;
+import com.ambroz.formula.gamemodel.datamodel.Polyline;
+import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.utils.Calc;
-import com.ambroz.formula.gamemodel.utils.PropertyChanger;
+import com.ambroz.formula.gamemodel.datamodel.PropertyChanger;
 
 /**
  * This class represents track of the race. It is composed from two polylines (left and right) and next two polylines

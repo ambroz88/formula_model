@@ -1,19 +1,16 @@
-package com.ambroz.formula.gamemodel;
+package com.ambroz.formula.gamemodel.race;
 
-import static com.ambroz.formula.gamemodel.track.TrackBuilder.BUILD_LEFT;
-
+import com.ambroz.formula.gamemodel.datamodel.CoreModel;
 import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
-import com.ambroz.formula.gamemodel.datamodel.Track;
-import com.ambroz.formula.gamemodel.track.TrackBuilder;
-import com.ambroz.formula.gamemodel.turns.TurnMaker;
-import com.ambroz.formula.gamemodel.utils.PropertyChanger;
+import com.ambroz.formula.gamemodel.track.Track;
+import static com.ambroz.formula.gamemodel.track.TrackBuilder.BUILD_LEFT;
 
 /**
  *
  * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
-public class GameModel extends PropertyChanger {
+public class RaceModel extends CoreModel {
 
     public static final int FIRST_TURN = 5;
     public static final int NORMAL_TURN = 6;
@@ -21,19 +18,11 @@ public class GameModel extends PropertyChanger {
     public static final int AUTO_FINISH = 8;
     public static final int GAME_OVER = 9;
 
-    private final Paper paper;
     private final TurnMaker turnMaker;
-    private final TrackBuilder trackBuilder;
 
-    private Track track;
-    private String language;
-    private int stage;
-
-    public GameModel() {
-        paper = new Paper();
+    public RaceModel(Paper gamePaper) {
+        super(gamePaper);
         turnMaker = new TurnMaker(this);
-        track = new Track();
-        trackBuilder = new TrackBuilder(this);
     }
 
     public void moveWithPlayer(Point click) {
@@ -89,7 +78,7 @@ public class GameModel extends PropertyChanger {
         turnMaker.getFormula(1).reset();
         turnMaker.resetTurns();
 
-        turnMaker.startPosition(getRaceTrack().getStart());
+        turnMaker.startPosition(getTrack().getStart());
         repaintScene();
     }
 
@@ -109,43 +98,14 @@ public class GameModel extends PropertyChanger {
         firePropertyChange("repaint", false, true);
     }
 
-    public Paper getPaper() {
-        return paper;
-    }
-
-    public TrackBuilder getTrackBuilder() {
-        return trackBuilder;
-    }
-
     public TurnMaker getTurnMaker() {
         return turnMaker;
     }
 
-    public Track getRaceTrack() {
-        return track;
-    }
-
-    public void setTrack(Track track) {
-        this.track = track;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
+    @Override
     public void setLanguage(String language) {
-        this.language = language;
-        getTrackBuilder().setLanguage(language);
+        super.setLanguage(language);
 //        hintLabels = new HintLabels(language);
-        firePropertyChange("language", null, language);
-    }
-
-    public int getStage() {
-        return stage;
-    }
-
-    public void setStage(int stage) {
-        this.stage = stage;
     }
 
     public void fireLoadTrack() {

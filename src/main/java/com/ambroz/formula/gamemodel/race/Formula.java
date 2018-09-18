@@ -1,5 +1,8 @@
-package com.ambroz.formula.gamemodel.datamodel;
+package com.ambroz.formula.gamemodel.race;
 
+import com.ambroz.formula.gamemodel.datamodel.Point;
+import com.ambroz.formula.gamemodel.datamodel.Polyline;
+import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.enums.FormulaType;
 
 /**

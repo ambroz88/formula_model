@@ -2,7 +2,6 @@ package com.ambroz.formula.gamemodel.track;
 
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
-import com.ambroz.formula.gamemodel.datamodel.Track;
 import com.ambroz.formula.gamemodel.utils.Calc;
 
 /**

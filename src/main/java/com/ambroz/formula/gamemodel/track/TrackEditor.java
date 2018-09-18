@@ -1,5 +1,7 @@
 package com.ambroz.formula.gamemodel.track;
 
+import com.ambroz.formula.gamemodel.datamodel.CoreModel;
+import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.utils.Calc;
@@ -8,12 +10,13 @@ import com.ambroz.formula.gamemodel.utils.Calc;
  *
  * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
-public class TrackEditor extends Track {
+public class TrackEditor extends CoreModel {
 
     private int movePointIndex;
     private int side;
 
-    public TrackEditor() {
+    public TrackEditor(Paper paper) {
+        super(paper);
     }
 
     /**
@@ -24,8 +27,8 @@ public class TrackEditor extends Track {
      */
     public boolean clickOnTrack(Point click) {
         //check if player clicked on the point from left side of the track
-        for (int i = 1; i < getLeft().getLength() - 1; i++) {
-            if (click.isEqual(getLeft().getPoint(i))) {
+        for (int i = 1; i < getTrack().getLeft().getLength() - 1; i++) {
+            if (click.isEqual(getTrack().getLeft().getPoint(i))) {
                 movePointIndex = i;
                 side = Track.LEFT;
                 break;
@@ -33,8 +36,8 @@ public class TrackEditor extends Track {
         }
         if (movePointIndex == 0) {
             //check if player clicked on the point from right side of the track
-            for (int i = 1; i < getRight().getLength() - 1; i++) {
-                if (click.isEqual(getRight().getPoint(i))) {
+            for (int i = 1; i < getTrack().getRight().getLength() - 1; i++) {
+                if (click.isEqual(getTrack().getRight().getPoint(i))) {
                     movePointIndex = i;
                     side = Track.RIGHT;
                     break;
@@ -53,21 +56,26 @@ public class TrackEditor extends Track {
      * @return true if there is no intersection with the rest of the track, false otherwise
      */
     public boolean isNewPointValid(Point click) {
-        Point newEdgeStart = getLine(side).getPoint(movePointIndex - 1);
-        Point newEdgeEnd = getLine(side).getPoint(movePointIndex + 1);
+        Point newEdgeStart = getTrack().getLine(side).getPoint(movePointIndex - 1);
+        Point newEdgeEnd = getTrack().getLine(side).getPoint(movePointIndex + 1);
+
         // new segments can't cross start, finish or opposite side
         boolean intersect = crossEndLines(newEdgeStart, newEdgeEnd, click)
-                || getOppLine(side).checkSegmentCrossing(newEdgeStart, click)
-                || getOppLine(side).checkSegmentCrossing(newEdgeEnd, click);
+                || getTrack().getOppLine(side).checkSegmentCrossing(newEdgeStart, click)
+                || getTrack().getOppLine(side).checkSegmentCrossing(newEdgeEnd, click);
+
         if (!intersect) {
-            // new segments can't cross it own side but it can touch it
-            for (int i = 0; i < getLine(side).getLength() - 1; i++) {
+
+            for (int i = 0; i < getTrack().getLine(side).getLength() - 1; i++) {
+                // new segments can't cross it's own side but it can touch it
                 if (i < movePointIndex - 1 || i > movePointIndex) {
-                    Segment actRight = getLine(side).getSegment(i);
+
+                    Segment actRight = getTrack().getLine(side).getSegment(i);
                     if ((int) Calc.crossing(click, newEdgeStart, actRight)[0] == Calc.INSIDE
                             || (int) Calc.crossing(click, newEdgeEnd, actRight)[0] == Calc.INSIDE) {
                         intersect = true;
                     }
+
                 }
             }
 
@@ -75,7 +83,7 @@ public class TrackEditor extends Track {
 
         if (intersect == false) {
             //overwrite point of the track
-            getLine(side).changePoint(click, movePointIndex);
+            getTrack().getLine(side).changePoint(click, movePointIndex);
         }
         movePointIndex = 0;
         return !intersect;
@@ -83,17 +91,20 @@ public class TrackEditor extends Track {
 
     private boolean crossEndLines(Point edgeStart, Point edgeEnd, Point click) {
         boolean intersect = false;
-        if (getStart() != null) {
-            if ((int) Calc.crossing(edgeStart, click, getStart())[0] == Calc.INSIDE
-                    || (int) Calc.crossing(edgeEnd, click, getStart())[0] == Calc.INSIDE) {
+        if (getTrack().getStart() != null) {
+
+            if ((int) Calc.crossing(edgeStart, click, getTrack().getStart())[0] == Calc.INSIDE
+                    || (int) Calc.crossing(edgeEnd, click, getTrack().getStart())[0] == Calc.INSIDE) {
                 intersect = true;
-            } else if (getFinish() != null) {
-                if ((int) Calc.crossing(edgeStart, click, getFinish())[0] == Calc.INSIDE
-                        || (int) Calc.crossing(edgeEnd, click, getFinish())[0] == Calc.INSIDE) {
+            } else if (getTrack().getFinish() != null) {
+                if ((int) Calc.crossing(edgeStart, click, getTrack().getFinish())[0] == Calc.INSIDE
+                        || (int) Calc.crossing(edgeEnd, click, getTrack().getFinish())[0] == Calc.INSIDE) {
                     intersect = true;
                 }
             }
+
         }
         return intersect;
     }
+
 }

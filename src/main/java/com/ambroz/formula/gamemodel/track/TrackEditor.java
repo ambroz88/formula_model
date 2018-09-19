@@ -4,6 +4,8 @@ import com.ambroz.formula.gamemodel.datamodel.CoreModel;
 import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
+import static com.ambroz.formula.gamemodel.track.TrackBuilder.EDIT_PRESS;
+import static com.ambroz.formula.gamemodel.track.TrackBuilder.EDIT_RELEASE;
 import com.ambroz.formula.gamemodel.utils.Calc;
 
 /**
@@ -20,12 +22,36 @@ public class TrackEditor extends CoreModel {
     }
 
     /**
+     * This is first step of track point replacing. Getting coordination and position of moved point.
+     *
+     * @param click is point from which user take the point (place where mouse was pressed)
+     * @return
+     */
+    public boolean memorizeTrackPoint(Point click) {
+        boolean onTrack = false;
+        if (getStage() == EDIT_PRESS) {
+            click.toGridUnits(getPaper().getGridSize());
+
+            onTrack = clickOnTrack(click);
+            if (!onTrack) {
+//                fireHint(HintLabels.NO_POINT);
+            } else {
+//                fireHint(HintLabels.EMPTY);
+                setStage(EDIT_RELEASE);
+                repaintScene();
+            }
+        }
+
+        return onTrack;
+    }
+
+    /**
      * It finds out which point will be moved, resp it's side and position. Start and finish can't be moved.
      *
      * @param click is point where user clicked - potential point that will be moved
      * @return true if the point is part of the track
      */
-    public boolean clickOnTrack(Point click) {
+    private boolean clickOnTrack(Point click) {
         //check if player clicked on the point from left side of the track
         for (int i = 1; i < getTrack().getLeft().getLength() - 1; i++) {
             if (click.isEqual(getTrack().getLeft().getPoint(i))) {
@@ -49,13 +75,30 @@ public class TrackEditor extends CoreModel {
     }
 
     /**
+     * This is second step of replacing track point. Getting new coordinations of replaced point.
+     *
+     * @param click is point where user placed replaced point (place where mouse was released)
+     */
+    public void replaceTrackPoint(Point click) {
+        if (getStage() == EDIT_RELEASE) {
+            click.toGridUnits(getPaper().getGridSize());
+
+            setStage(EDIT_PRESS);
+            if (!isNewPointValid(click)) {
+//                fireHint(HintLabels.CROSSING);
+            }
+            repaintScene();
+        }
+    }
+
+    /**
      * It validates if user moves the point in correct position so newly created segments don't have intersect with any
      * other segments.
      *
      * @param click is point where user placed certain point of the track
      * @return true if there is no intersection with the rest of the track, false otherwise
      */
-    public boolean isNewPointValid(Point click) {
+    private boolean isNewPointValid(Point click) {
         Point newEdgeStart = getTrack().getLine(side).getPoint(movePointIndex - 1);
         Point newEdgeEnd = getTrack().getLine(side).getPoint(movePointIndex + 1);
 

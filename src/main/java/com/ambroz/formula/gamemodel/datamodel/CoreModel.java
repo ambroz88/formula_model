@@ -1,5 +1,6 @@
 package com.ambroz.formula.gamemodel.datamodel;
 
+import com.ambroz.formula.gamemodel.labels.HintLabels;
 import com.ambroz.formula.gamemodel.track.Track;
 
 /**
@@ -8,6 +9,7 @@ import com.ambroz.formula.gamemodel.track.Track;
  */
 public class CoreModel extends PropertyChanger {
 
+    protected HintLabels hintLabels;
     private final Paper paper;
     private Track track;
     private String language;
@@ -18,6 +20,11 @@ public class CoreModel extends PropertyChanger {
         track = new Track();
     }
 
+    public void repaintScene() {
+        //cought by Draw panels
+        firePropertyChange("repaint", false, true);
+    }
+
     public String getLanguage() {
         return language;
     }
@@ -25,6 +32,7 @@ public class CoreModel extends PropertyChanger {
     public void setLanguage(String language) {
         String old = getLanguage();
         this.language = language;
+        hintLabels = new HintLabels(language);
         firePropertyChange("language", old, language);
     }
 

@@ -93,19 +93,8 @@ public class RaceModel extends CoreModel {
         }
     }
 
-    public void repaintScene() {
-        //cought by Draw
-        firePropertyChange("repaint", false, true);
-    }
-
     public TurnMaker getTurnMaker() {
         return turnMaker;
-    }
-
-    @Override
-    public void setLanguage(String language) {
-        super.setLanguage(language);
-//        hintLabels = new HintLabels(language);
     }
 
     public void fireLoadTrack() {

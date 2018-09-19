@@ -11,20 +11,16 @@ import com.ambroz.formula.gamemodel.utils.FileIO;
  *
  * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
-public class TrackMenuLabels {
+public class GeneralLabels {
 
-    public final static String BUILD_LEFT = "buildLeft";
-    public final static String BUILD_RIGHT = "buildRight";
-    public final static String EDIT = "edit";
-    public final static String DELETE_LAST = "deleteLast";
-    public final static String REVERSE = "reverse";
-    public final static String NEW_TRACK = "newTrack";
-    public final static String SAVE = "save";
+    public final static String BUILD_TRACK = "build";
+    public final static String PLAY_GAME = "play";
+    public final static String OPTIONS = "options";
 
     private Properties properties;
 
-    public TrackMenuLabels(String language) {
-        String fileName = language + "/TrackMenu.properties";
+    public GeneralLabels(String language) {
+        String fileName = language + "/General.properties";
         try {
             this.properties = FileIO.loadProperties(fileName);
         } catch (IOException ex) {

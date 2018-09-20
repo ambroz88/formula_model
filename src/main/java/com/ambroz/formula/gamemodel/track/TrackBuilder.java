@@ -271,7 +271,7 @@ public class TrackBuilder extends TrackEditor {
     /**
      * It generates points where the track should be finished or points where to start with second track side.
      */
-    private void generateEndPoints() {
+    public void generateEndPoints() {
         if (getTrack().getOppLine(side).getLength() > 1 && getTrack().getLine(side).isEmpty()) {
             generateStartTurns();
         } else if (getTrack().getOppLine(side).getLength() > 1 && !getTrack().getLine(side).isEmpty()) {
@@ -379,7 +379,7 @@ public class TrackBuilder extends TrackEditor {
         return message;
     }
 
-    private void fireTrackReady(boolean ready) {
+    public void fireTrackReady(boolean ready) {
         firePropertyChange("trackReady", !ready, ready);
     }
 

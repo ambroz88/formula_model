@@ -4,8 +4,6 @@ import com.ambroz.formula.gamemodel.datamodel.CoreModel;
 import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
-import static com.ambroz.formula.gamemodel.track.TrackBuilder.EDIT_PRESS;
-import static com.ambroz.formula.gamemodel.track.TrackBuilder.EDIT_RELEASE;
 import com.ambroz.formula.gamemodel.utils.Calc;
 
 /**
@@ -29,7 +27,7 @@ public class TrackEditor extends CoreModel {
      */
     public boolean memorizeTrackPoint(Point click) {
         boolean onTrack = false;
-        if (getStage() == EDIT_PRESS) {
+        if (getStage() == TrackBuilder.EDIT_PRESS) {
             click.toGridUnits(getPaper().getGridSize());
 
             onTrack = clickOnTrack(click);
@@ -37,7 +35,7 @@ public class TrackEditor extends CoreModel {
 //                fireHint(HintLabels.NO_POINT);
             } else {
 //                fireHint(HintLabels.EMPTY);
-                setStage(EDIT_RELEASE);
+                setStage(TrackBuilder.EDIT_RELEASE);
                 repaintScene();
             }
         }
@@ -80,10 +78,10 @@ public class TrackEditor extends CoreModel {
      * @param click is point where user placed replaced point (place where mouse was released)
      */
     public void replaceTrackPoint(Point click) {
-        if (getStage() == EDIT_RELEASE) {
+        if (getStage() == TrackBuilder.EDIT_RELEASE) {
             click.toGridUnits(getPaper().getGridSize());
 
-            setStage(EDIT_PRESS);
+            setStage(TrackBuilder.EDIT_PRESS);
             if (!isNewPointValid(click)) {
 //                fireHint(HintLabels.CROSSING);
             }

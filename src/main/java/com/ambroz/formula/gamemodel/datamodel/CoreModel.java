@@ -5,7 +5,7 @@ import com.ambroz.formula.gamemodel.track.Track;
 
 /**
  *
- * @author Jiri Ambroz
+ * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
 public class CoreModel extends PropertyChanger {
 

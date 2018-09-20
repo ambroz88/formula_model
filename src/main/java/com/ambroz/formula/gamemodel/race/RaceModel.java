@@ -4,7 +4,6 @@ import com.ambroz.formula.gamemodel.datamodel.CoreModel;
 import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.track.Track;
-import static com.ambroz.formula.gamemodel.track.TrackBuilder.BUILD_LEFT;
 
 /**
  *
@@ -65,7 +64,7 @@ public class RaceModel extends CoreModel {
     }
 
     public void endGame() {
-        setStage(BUILD_LEFT);
+        setStage(FIRST_TURN);
         firePropertyChange("buildTrack", false, true); // cought by TrackMenu
         firePropertyChange("startDraw", false, true); // cought by TrackMenu and Draw
         resetPlayers();

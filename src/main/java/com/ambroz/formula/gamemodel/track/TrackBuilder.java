@@ -61,28 +61,11 @@ public class TrackBuilder extends TrackEditor {
             //OPPOSITE LINE WAS ALLREADY STARTED
             if (actLine.isEmpty()) {
                 determineStartLine(click);
-            } else if (actLine.getLast().isEqual(click) == false && buildSecondSide(click)) {
+            } else if (actLine.getLast().isEqual(click) == false && validateSecondLine(click)) {
                 addPointToTrack(click);
             }
-        } else if (actLine.getLength() <= 1) {
-            //OPPOSITE LINE IS EMPTY
-            if (actLine.isEmpty()) {
-                //first point in side is drawn
-                getPoints().addPoint(click);
-            }
-            getTrack().addPoint(side, click);
-        } else if (!actLine.getLast().isEqual(click)) {
-            //point click is not identical with the last point in builded side
-            if (!actLine.checkOwnCrossing(click)) {
-                //new edge of builded side don't cross any other edge
-                if (correctDirection(actLine, click)) {
-                    getTrack().addPoint(side, click);
-                }
-            } else {
-                message = HintLabels.CROSSING;
-            }
         } else {
-            message = HintLabels.IDENTICAL_POINTS;
+            validateJustActiveLine(actLine, click);
         }
 
         repaintScene();
@@ -106,27 +89,11 @@ public class TrackBuilder extends TrackEditor {
     private void determineStartLine(Point click) {
         if (getPoints().contains(click)) {
             generateFinishTurns();
-            //in point of click there will be drawn a point
             getPoints().addPoint(click);
             getTrack().addPoint(side, click);
         } else {
             message = HintLabels.WRONG_START;
         }
-    }
-
-    /**
-     * Position of point click is valid so it can be added to the track.
-     *
-     * @param click is point where user clicked
-     */
-    private void addPointToTrack(Point click) {
-        getTrack().addPoint(side, click);
-
-        boolean ready = getTrack().isReadyForDraw() && getPoints().contains(click);
-        if (ready) {
-            getTrack().finishIndexes();
-        }
-//        fireTrackReady(ready);
     }
 
     /**
@@ -145,12 +112,58 @@ public class TrackBuilder extends TrackEditor {
     }
 
     /**
+     * Position of point click is valid so it can be added to the track.
+     *
+     * @param click is point where user clicked
+     */
+    private void addPointToTrack(Point click) {
+        getTrack().addPoint(side, click);
+
+        boolean ready = getTrack().isReadyForDraw() && getPoints().contains(click);
+        if (ready) {
+            getTrack().finishIndexes();
+        }
+
+        fireTrackReady(ready);
+    }
+
+    /**
+     * This method validates whether is point valid in situation when second track line didn't start to build.
+     *
+     * @param actLine is track line that is built
+     * @param click is point where user clicked
+     */
+    private void validateJustActiveLine(Polyline actLine, Point click) {
+        if (actLine.isEmpty()) {
+            //first point in side is drawn
+            getPoints().addPoint(click);
+            getTrack().addPoint(side, click);
+        } else if (!actLine.getLast().isEqual(click)) {
+
+            //point click is not identical with the last point in builded side
+            if (actLine.getLength() == 1) {
+                getTrack().addPoint(side, click);
+            } else if (!actLine.checkOwnCrossing(click)) {
+                //new edge of builded side don't cross any other edge
+                if (correctDirection(actLine, click)) {
+                    getTrack().addPoint(side, click);
+                }
+            } else {
+                message = HintLabels.CROSSING;
+            }
+
+        } else {
+            message = HintLabels.IDENTICAL_POINTS;
+        }
+    }
+
+    /**
      * This method tests if it's possible to add <code>point click</code> to the track. It controls both side of track.
      *
      * @param click is point which is tested or added
      * @return true if <code>click</code> is possible to add
      */
-    private boolean buildSecondSide(Point click) {
+    private boolean validateSecondLine(Point click) {
         Polyline actLine = getTrack().getLine(side);
         Polyline oppLine = getTrack().getLine(oppSide);
         Segment trackEnd = new Segment(actLine.getLast(), oppLine.getPoint(getTrack().getIndex(oppSide)));
@@ -313,9 +326,7 @@ public class TrackBuilder extends TrackEditor {
         getTrack().removeLastPoint(side);
         if (!getTrack().getLine(side).isEmpty()) {
             boolean ready = getTrack().isReady() && getPoints().contains(getTrack().getLine(side).getLast());
-            if (ready) {
-//                fireTrackReady(ready);
-            }
+            fireTrackReady(ready);
         }
     }
 
@@ -366,6 +377,10 @@ public class TrackBuilder extends TrackEditor {
 
     public String getMessage() {
         return message;
+    }
+
+    private void fireTrackReady(boolean ready) {
+        firePropertyChange("trackReady", !ready, ready);
     }
 
 }

@@ -16,6 +16,7 @@ public class GeneralLabels {
     public final static String BUILD_TRACK = "build";
     public final static String PLAY_GAME = "play";
     public final static String OPTIONS = "options";
+    public final static String TRACK_TITLE = "trackTitle";
 
     private Properties properties;
 

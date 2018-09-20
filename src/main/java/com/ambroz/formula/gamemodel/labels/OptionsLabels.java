@@ -1,14 +1,15 @@
 package com.ambroz.formula.gamemodel.labels;
 
-import com.ambroz.formula.gamemodel.utils.FileIO;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ambroz.formula.gamemodel.utils.FileIO;
+
 /**
  *
- * @author Jiri Ambroz
+ * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
 public class OptionsLabels {
 

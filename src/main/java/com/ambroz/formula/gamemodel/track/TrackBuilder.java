@@ -49,26 +49,29 @@ public class TrackBuilder extends TrackEditor {
      * @param click is point where user clicked.
      */
     public void buildTrack(Point click) {
-        click.toGridUnits(getPaper().getGridSize());
+        if (getStage() < TrackBuilder.EDIT_PRESS) {
+            click.toGridUnits(getPaper().getGridSize());
 
-        configureTrackSides();
+            configureTrackSides();
 
-        Polyline actLine = getTrack().getLine(side);
-        Polyline oppositeLine = getTrack().getLine(oppSide);
-        message = HintLabels.EMPTY;
+            Polyline actLine = getTrack().getLine(side);
+            Polyline oppositeLine = getTrack().getLine(oppSide);
+            message = HintLabels.EMPTY;
 
-        if (!oppositeLine.isEmpty()) {
-            //OPPOSITE LINE WAS ALLREADY STARTED
-            if (actLine.isEmpty()) {
-                determineStartLine(click);
-            } else if (actLine.getLast().isEqual(click) == false && validateSecondLine(click)) {
-                addPointToTrack(click);
+            if (!oppositeLine.isEmpty()) {
+                //OPPOSITE LINE WAS ALLREADY STARTED
+                if (actLine.isEmpty()) {
+                    determineStartLine(click);
+                } else if (actLine.getLast().isEqual(click) == false && validateSecondLine(click)) {
+                    addPointToTrack(click);
+                }
+            } else {
+                validateJustActiveLine(actLine, click);
             }
-        } else {
-            validateJustActiveLine(actLine, click);
-        }
 
-        repaintScene();
+            fireHint(getMessage());
+            repaintScene();
+        }
     }
 
     private void configureTrackSides() {
@@ -255,16 +258,12 @@ public class TrackBuilder extends TrackEditor {
             generateEndPoints();
 
             repaintScene();
-//        } else {
-//            if (side == Track.LEFT) {
-//                fireHint(HintLabels.RIGHT_SIDE_FIRST);
-            //caught by TrackMenu:
-//                firePropertyChange("rightSide", false, true);
-//            } else {
-//                fireHint(HintLabels.LEFT_SIDE_FIRST);
-            //caught by TrackMenu:
-//                firePropertyChange("leftSide", false, true);
-//            }
+        } else {
+            if (side == Track.LEFT) {
+                fireHint(HintLabels.RIGHT_SIDE_FIRST);
+            } else {
+                fireHint(HintLabels.LEFT_SIDE_FIRST);
+            }
         }
     }
 
@@ -291,6 +290,20 @@ public class TrackBuilder extends TrackEditor {
         }
 
         getTrack().setWidth(side);
+    }
+
+    public void startEditing() {
+        setStage(TrackBuilder.EDIT_PRESS);
+        fireHint(HintLabels.MOVE_POINTS);
+        getPoints().clear();
+        repaintScene();
+    }
+
+    public void switchTrack() {
+        setStage(TrackBuilder.BUILD_LEFT);
+        getTrack().switchStart();
+        generateEndPoints();
+        repaintScene();
     }
 
     /**
@@ -357,10 +370,10 @@ public class TrackBuilder extends TrackEditor {
             TrackIO.trackToJSON(getTrack(), trackName);
             // cought by TrackTopComponent:
             firePropertyChange("newTrack", false, true);
-//            fireHint(HintLabels.HINT_SAVED);
+            fireHint(HintLabels.HINT_SAVED);
             saved = true;
         } catch (IOException ex) {
-//            fireHint(HintLabels.HINT_FAILED);
+            fireHint(HintLabels.HINT_FAILED);
             saved = false;
         }
         return saved;

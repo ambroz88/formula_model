@@ -21,8 +21,13 @@ public class CoreModel extends PropertyChanger {
     }
 
     public void repaintScene() {
-        //cought by Draw panels
+        //cought by drawing components
         firePropertyChange("repaint", false, true);
+    }
+
+    public void fireHint(String hintLabelProperty) {
+        //cought by HintComponent
+        firePropertyChange("hint", "", hintLabels.getValue(hintLabelProperty));
     }
 
     public String getLanguage() {

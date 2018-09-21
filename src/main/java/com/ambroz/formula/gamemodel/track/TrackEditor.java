@@ -4,6 +4,7 @@ import com.ambroz.formula.gamemodel.datamodel.CoreModel;
 import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
+import com.ambroz.formula.gamemodel.labels.HintLabels;
 import com.ambroz.formula.gamemodel.utils.Calc;
 
 /**
@@ -32,9 +33,9 @@ public class TrackEditor extends CoreModel {
 
             onTrack = clickOnTrack(click);
             if (!onTrack) {
-//                fireHint(HintLabels.NO_POINT);
+                fireHint(HintLabels.NO_POINT);
             } else {
-//                fireHint(HintLabels.EMPTY);
+                fireHint(HintLabels.EMPTY);
                 setStage(TrackBuilder.EDIT_RELEASE);
                 repaintScene();
             }
@@ -83,7 +84,7 @@ public class TrackEditor extends CoreModel {
 
             setStage(TrackBuilder.EDIT_PRESS);
             if (!isNewPointValid(click)) {
-//                fireHint(HintLabels.CROSSING);
+                fireHint(HintLabels.CROSSING);
             }
             repaintScene();
         }

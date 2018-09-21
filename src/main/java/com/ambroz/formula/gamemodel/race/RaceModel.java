@@ -3,6 +3,7 @@ package com.ambroz.formula.gamemodel.race;
 import com.ambroz.formula.gamemodel.datamodel.CoreModel;
 import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
+import com.ambroz.formula.gamemodel.labels.HintLabels;
 import com.ambroz.formula.gamemodel.track.Track;
 
 /**
@@ -28,6 +29,7 @@ public class RaceModel extends CoreModel {
         click.toGridUnits(getPaper().getGridSize());
 
         if (!getPaper().isOutside(click)) {
+            fireHint(HintLabels.EMPTY);
 
             if (getStage() == FIRST_TURN) {
                 turnMaker.firstTurn(click);
@@ -37,6 +39,8 @@ public class RaceModel extends CoreModel {
 
             checkWinner();
             repaintScene();
+        } else {
+            fireHint(HintLabels.OUTSIDE);
         }
     }
 
@@ -81,24 +85,14 @@ public class RaceModel extends CoreModel {
         repaintScene();
     }
 
-    public void fireTrackReady(boolean ready) {
-        // cought by StartMenu, TrackMenu
-        firePropertyChange("startVisible", !ready, ready);
-        if (ready) {
-//            fireHint(HintLabels.TRACK_READY);
-            repaintScene();
-        } else {
-//            fireHint(HintLabels.EMPTY);
-        }
-    }
-
     public TurnMaker getTurnMaker() {
         return turnMaker;
     }
 
     public void fireLoadTrack() {
-        //cought by TracksComponent
+        //cought by TrackListComponent
         firePropertyChange("loadTrack", false, true);
+        fireHint(HintLabels.START_POSITION);
     }
 
 }

@@ -125,6 +125,7 @@ public class TrackBuilder extends TrackEditor {
         boolean ready = getTrack().isReadyForDraw() && getPoints().contains(click);
         if (ready) {
             getTrack().finishIndexes();
+            message = HintLabels.TRACK_READY;
         }
 
         fireTrackReady(ready);
@@ -253,8 +254,9 @@ public class TrackBuilder extends TrackEditor {
     //=================================== FUNCTIONALITY OF GUI BUTTONS ===================================
     public void startBuild(int side) {
         if (getTrack().getOppLine(side).getLength() != 1) {
-            setSide(side);
+            fireHint(HintLabels.EMPTY);
 
+            setSide(side);
             generateEndPoints();
 
             repaintScene();
@@ -300,6 +302,7 @@ public class TrackBuilder extends TrackEditor {
     }
 
     public void switchTrack() {
+        fireHint(HintLabels.EMPTY);
         setStage(TrackBuilder.BUILD_LEFT);
         getTrack().switchStart();
         generateEndPoints();
@@ -310,6 +313,7 @@ public class TrackBuilder extends TrackEditor {
      * It removes last point of active track side.
      */
     public void deletePoint() {
+        fireHint(HintLabels.EMPTY);
         int actSize = getTrack().getLine(side).getLength();
         int oppSize = getTrack().getLine(oppSide).getLength();
 
@@ -359,8 +363,10 @@ public class TrackBuilder extends TrackEditor {
     }
 
     public void clearScene() {
+        fireHint(HintLabels.EMPTY);
         getTrack().reset();
         getPoints().clear();
+        fireTrackReady(false);
         repaintScene();
     }
 

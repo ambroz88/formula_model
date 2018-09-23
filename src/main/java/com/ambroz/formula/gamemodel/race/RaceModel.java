@@ -52,11 +52,15 @@ public class RaceModel extends CoreModel {
 
     private void winnerAnnouncement() {
         getTurnMaker().resetTurns();
+//        firePropertyChange("winner", "", getTurnMaker().createWinnerMessage());
+        firePropertyChange("winner", "", "Player  " + getHintLabels().getValue(HintLabels.WINNER));
+        setStage(GAME_OVER);
     }
 
     public void prepareGame(Track track) {
         setTrack(track);
         resetGame();
+        fireHint(HintLabels.START_POSITION);
     }
 
     /**
@@ -72,6 +76,19 @@ public class RaceModel extends CoreModel {
         firePropertyChange("buildTrack", false, true); // cought by TrackMenu
         firePropertyChange("startDraw", false, true); // cought by TrackMenu and Draw
         resetPlayers();
+    }
+
+    /**
+     * Fire information about who crashed and how fast.
+     *
+     * @param count is number of rounds that player will be wait for other player
+     */
+    public void fireCrash(int count) {
+//        String text = hintLabels.getValue(HintLabels.OUCH) + " " + turnMaker.getFormula(turnMaker.getActID()).getName() + " "
+        String text = hintLabels.getValue(HintLabels.OUCH) + " Player "
+                + hintLabels.getValue(HintLabels.CRASH) + " " + count + "!!!";
+        //cought by HintPanel
+        firePropertyChange("crash", "", text);
     }
 
     /**

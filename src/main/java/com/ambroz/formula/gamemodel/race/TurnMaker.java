@@ -61,6 +61,7 @@ public class TurnMaker {
                 act.addPoint(selectedTurn.getCollision());
                 act.lengthUp();
                 crashTurn();
+                model.fireCrash(maxSpeed);
 
             }
         }

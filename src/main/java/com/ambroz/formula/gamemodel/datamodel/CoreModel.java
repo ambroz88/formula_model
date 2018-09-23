@@ -27,7 +27,7 @@ public class CoreModel extends PropertyChanger {
 
     public void fireHint(String hintLabelProperty) {
         //cought by HintComponent
-        firePropertyChange("hint", "", hintLabels.getValue(hintLabelProperty));
+        firePropertyChange("hint", null, hintLabels.getValue(hintLabelProperty));
     }
 
     public String getLanguage() {
@@ -59,6 +59,10 @@ public class CoreModel extends PropertyChanger {
 
     public Paper getPaper() {
         return paper;
+    }
+
+    public HintLabels getHintLabels() {
+        return hintLabels;
     }
 
 }

@@ -1,9 +1,9 @@
 package com.ambroz.formula.gamemodel.race;
 
-import com.ambroz.formula.gamemodel.datamodel.Point;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.ambroz.formula.gamemodel.datamodel.Point;
 
 /**
  *
@@ -18,10 +18,6 @@ public class Turns {
         for (int i = 0; i < 9; i++) {
             turns[i] = new Turn();
         }
-    }
-
-    public int getSize() {
-        return turns.length;
     }
 
     public List<Point> getFreePoints() {
@@ -74,8 +70,49 @@ public class Turns {
         return confirmed;
     }
 
+    public void createCornerTurns(Point center) {
+        getTurn(0).setPoint(new Point(center.x - 1, center.y - 1));
+        getTurn(2).setPoint(new Point(center.x + 1, center.y - 1));
+        getTurn(6).setPoint(new Point(center.x - 1, center.y + 1));
+        getTurn(8).setPoint(new Point(center.x + 1, center.y + 1));
+    }
+
+    public void createCrashTurns(Point center) {
+        getTurn(1).setPoint(new Point(center.x, center.y - 1));
+        getTurn(3).setPoint(new Point(center.x - 1, center.y));
+        getTurn(5).setPoint(new Point(center.x + 1, center.y));
+        getTurn(7).setPoint(new Point(center.x, center.y + 1));
+    }
+
+    public void createCenterTurn(Point center) {
+        getTurn(4).setPoint(center);
+    }
+
+    public void makeCrashTurnsEmpty() {
+        getTurn(1).setExist(false);
+        getTurn(3).setExist(false);
+        getTurn(5).setExist(false);
+        getTurn(7).setExist(false);
+
+    }
+
+    public void makeCornerTurnsEmpty() {
+        getTurn(0).setExist(false);
+        getTurn(2).setExist(false);
+        getTurn(6).setExist(false);
+        getTurn(8).setExist(false);
+    }
+
+    public void makeCenterTurnEmpty() {
+        getTurn(4).setExist(false);
+    }
+
     public Turn getTurn(int pos) {
         return turns[pos];
+    }
+
+    public int getSize() {
+        return turns.length;
     }
 
     public void reset() {

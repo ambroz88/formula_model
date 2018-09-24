@@ -84,58 +84,58 @@ public class TurnMaker {
     public void startPosition(Segment startLine) {
         Point first = startLine.getFirst();
         Point second = startLine.getLast();
-        int difX;
-        int difY;
-        int startX;
-        int startY;
-        int numberOfPoints;
+        double numberOfPoints = Calc.distance(first, second) - 1;
 
-        if (first.x == second.x) {
-            /*start line is vertical, so coordinate X is the same for all positions,
-              up and down direction of formula is 0*/
-            racers.get(1).setSpeed(0);
-            startX = first.getX();
-            difX = 0;
-            difY = 1;
+        Point difPoint = new Point();
+        Point startPoint;
 
-            if (second.y > first.y) {
-                //direction of first move will be to the right
-                racers.get(1).setSide(1);
-                startY = first.getY();
-            } else {
-                //direction of first move will be to the left
-                racers.get(1).setSide(-1);
-                startY = second.getY();
-            }
-            numberOfPoints = Math.abs(first.getY() - second.getY()) - 1;
-
+        if (first.getX() == second.getX()) {
+            difPoint.y = 1;
+            startPoint = createVerticalStartPoints(first, second);
         } else {
-            /*start line is horizontal, so coordinate Y is the same for all positions,
-              left and right direction of formula is 0*/
-            racers.get(1).setSide(0);
-            startY = first.getY();
-            difX = 1;
-            difY = 0;
-
-            if (second.x > first.x) {
-                //direction of first move will be down
-                racers.get(1).setSpeed(-1);
-                startX = first.getX();
-            } else {
-                //direction of first move will be up
-                racers.get(1).setSpeed(1);
-                startX = second.getX();
-            }
-
-            numberOfPoints = Math.abs(first.getX() - second.getX()) - 1;
-
+            difPoint.x = 1;
+            startPoint = createHorizontalStartPositions(first, second);
         }
 
         for (int i = 0; i < numberOfPoints; i++) {
-            startX += difX;
-            startY += difY;
-            turns.getTurn(i).setPoint(new Point(startX, startY));
+            startPoint.x = startPoint.getX() + difPoint.getX();
+            startPoint.y = startPoint.getY() + difPoint.getY();
+            turns.getTurn(i).setPoint(new Point(startPoint));
         }
+    }
+
+    private Point createVerticalStartPoints(Point first, Point second) {
+        racers.get(1).setSpeed(0);
+        int startY;
+
+        if (second.getY() > first.getY()) {
+            //direction of first move will be to the right
+            racers.get(1).setSide(1);
+            startY = first.getY();
+        } else {
+            //direction of first move will be to the left
+            racers.get(1).setSide(-1);
+            startY = second.getY();
+        }
+
+        return new Point(first.getX(), startY);
+    }
+
+    private Point createHorizontalStartPositions(Point first, Point second) {
+        racers.get(1).setSide(0);
+        int startX;
+
+        if (second.getX() > first.getX()) {
+            //direction of first move will be down
+            racers.get(1).setSpeed(-1);
+            startX = first.getX();
+        } else {
+            //direction of first move will be up
+            racers.get(1).setSpeed(1);
+            startX = second.getX();
+        }
+
+        return new Point(startX, first.getY());
     }
 
     /**
@@ -155,67 +155,32 @@ public class TurnMaker {
         Point center = new Point(cenX, cenY);//stred moznosti
 
         //create possibilities of next turn
-        createTurns(center, false);
+        createStandardTurns(center);
         divideTurns(rivalLast);
     }
 
-    private void createTurns(Point center, boolean crashMode) {
-        //when Turns are creating again, all turns inside are non-colision
-        turns = new Turns();
-        // upper-LEFT corner
-        if (!crashMode) {
-            turns.getTurn(0).setPoint(new Point(center.x - 1, center.y - 1));
-        } else {
-            turns.getTurn(0).setExist(false);
+    private void createStandardTurns(Point center) {
+        turns.reset();
+        if (turnsCount == FOUR_TURNS) {
+            turns.createCornerTurns(center);
+            turns.makeCrashTurnsEmpty();
+            turns.makeCenterTurnEmpty();
+        } else if (turnsCount == FIVE_TURNS) {
+            turns.createCornerTurns(center);
+            turns.createCenterTurn(center);
+            turns.makeCrashTurnsEmpty();
+        } else if (turnsCount == NINE_TURNS) {
+            turns.createCornerTurns(center);
+            turns.createCrashTurns(center);
+            turns.createCenterTurn(center);
         }
-        // upper center
-        if (turnsCount == NINE_TURNS || crashMode) {
-            turns.getTurn(1).setPoint(new Point(center.x, center.y - 1));
-        } else {
-            turns.getTurn(1).setExist(false);
-        }
-        // upper-RIGHT corner
-        if (!crashMode) {
-            turns.getTurn(2).setPoint(new Point(center.x + 1, center.y - 1));
-        } else {
-            turns.getTurn(2).setExist(false);
-        }
-        // LEFT
-        if (turnsCount == NINE_TURNS || crashMode) {
-            turns.getTurn(3).setPoint(new Point(center.x - 1, center.y));
-        } else {
-            turns.getTurn(3).setExist(false);
-        }
-        // center
-        if (turnsCount == FIVE_TURNS || turnsCount == NINE_TURNS) {
-            turns.getTurn(4).setPoint(center);
-        } else {
-            turns.getTurn(4).setExist(false);
-        }
-        // RIGHT
-        if (turnsCount == NINE_TURNS || crashMode) {
-            turns.getTurn(5).setPoint(new Point(center.x + 1, center.y));
-        } else {
-            turns.getTurn(5).setExist(false);
-        }
-        // lower-LEFT corner
-        if (!crashMode) {
-            turns.getTurn(6).setPoint(new Point(center.x - 1, center.y + 1));
-        } else {
-            turns.getTurn(6).setExist(false);
-        }
-        // lower center
-        if (turnsCount == NINE_TURNS || crashMode) {
-            turns.getTurn(7).setPoint(new Point(center.x, center.y + 1));
-        } else {
-            turns.getTurn(7).setExist(false);
-        }
-        // lower-RIGHT corner
-        if (!crashMode) {
-            turns.getTurn(8).setPoint(new Point(center.x + 1, center.y + 1));
-        } else {
-            turns.getTurn(8).setExist(false);
-        }
+    }
+
+    private void createCrashTurn(Point center) {
+        turns.reset();
+        turns.createCrashTurns(center);
+        turns.makeCornerTurnsEmpty();
+        turns.makeCenterTurnEmpty();
     }
 
     /**
@@ -287,7 +252,7 @@ public class TurnMaker {
         }
         act.addPoint(crashCenter);
         //vykresleni X moznosti noveho tahu
-        createTurns(crashCenter, true);
+        createCrashTurn(crashCenter);
         divideTurns(racers.get(1).getLast());
     }
 
@@ -300,83 +265,123 @@ public class TurnMaker {
     private void divideTurns(Point rivalLast) {
         Formula act = racers.get(1);
         Track track = model.getTrack();
-        Polyline left = track.getLeft();
-        Polyline right = track.getRight();
+
         for (int i = 0; i < turns.getSize(); i++) {
             Point actPoint = turns.getTurn(i).getPoint();
+            Segment lastFormulaMove = new Segment(actPoint, act.getLast());
 
             if (actPoint.isEqual(rivalLast) == false && turns.getTurn(i).isExist()) {
-                boolean colision = false;
-                Segment colLine = null;
-                //----------- kontrola KOLIZE tahu s LEVOU STRANOU: -----------
-                for (int k = 0; k < left.getLength() - 1; k++) {
-                    Segment actLeft = left.getSegment(k);
-                    Object[] cross = Calc.crossing(act.getLast(), actPoint, actLeft);
-                    if ((int) cross[0] != Calc.OUTSIDE) {
-                        //novy bod ma prunik nebo se dotyka leve krajnice
-                        colLine = actLeft;
-                        Point colPoint = (Point) cross[1];
-                        colPoint.setLocation(Point.COLLISION_LEFT);
-                        turns.getTurn(i).setCollision(colPoint);
-                        colision = true;
-                        break;
-                    }
-                }
-                if (colision == false) { //tah nekrizi levou krajnici
-                    // ---------- kontrola KOLIZE novych moznosti s PRAVOU STRANOU: -------------
-                    for (int k = 0; k < right.getLength() - 1; k++) {
-                        Segment actRight = right.getSegment(k);
-                        Object[] cross = Calc.crossing(act.getLast(), actPoint, actRight);
-                        if ((int) cross[0] != Calc.OUTSIDE) {
-                            //novy bod ma prunik nebo se dotyka prave krajnice
-                            colLine = actRight;
-                            Point colPoint = (Point) cross[1];
-                            colPoint.setLocation(Point.COLLISION_RIGHT);
-                            turns.getTurn(i).setCollision(colPoint);
-                            colision = true;
-                            break;
+                boolean colision = checkLeftSideColision(i, lastFormulaMove);
+
+                if (!colision) {
+                    colision = checkRightSideColision(i, lastFormulaMove);
+
+                    if (!colision) {
+                        colision = checkStartColision(i, lastFormulaMove);
+
+                        if (!colision) {
+
+                            Object[] finish = Calc.crossing(lastFormulaMove, track.getFinish());
+                            if ((int) finish[0] == Calc.INSIDE) {
+                                //tah protina cilovou caru:
+                                turns.getTurn(i).setCollision((Point) finish[1]);
+                                actPoint.setLocation(Point.FINISH);
+                            } else if ((int) finish[0] == Calc.EDGE) {
+                                //tah se dotyka cilove cary:
+                                turns.getTurn(i).setCollision((Point) finish[1]);
+                                actPoint.setLocation(Point.FINISH_LINE);
+                            }
+
+                        } else { //tah vede mimo trat
+                            //kontrola zda hrac pred narazem projede cilem:
+                            Object[] finish = Calc.crossing(act.getLast(), actPoint, track.getFinish());
+                            if ((int) finish[0] != Calc.OUTSIDE && Calc.distance(act.getLast(), (Point) finish[1])
+                                    < Calc.distance(act.getLast(), turns.getTurn(i).getCollision())) {
+                                //hrac protne cil pred narazem
+                                turns.getTurn(i).setCollision((Point) finish[1]);
+                                actPoint.setLocation(Point.FINISH);
+                                colision = false;
+                            }
                         }
                     }
                 }
-                if (colision == false) {
-                    //tah nekrizi zadnou krajnici
-                    Object[] start = Calc.crossing(act.getLast(), actPoint, track.getStart());
-                    Object[] finish = Calc.crossing(act.getLast(), actPoint, track.getFinish());
-                    if ((int) start[0] != Calc.OUTSIDE && Track.RIGHT == Calc.sidePosition(actPoint, track.getStart())) {
-                        //tah protina start a konci vpravo od nej (projel se v protismeru)
-                        colLine = track.getStart();
-                        Point colPoint = (Point) start[1];
-                        colPoint.setLocation(Point.COLLISION_RIGHT);
-                        turns.getTurn(i).setCollision(colPoint);
-                        colision = true;
-                    } else if ((int) finish[0] == Calc.INSIDE) {
-                        //tah protina cilovou caru:
-                        turns.getTurn(i).setCollision((Point) finish[1]);
-                        actPoint.setLocation(Point.FINISH);
-                    } else if ((int) finish[0] == Calc.EDGE) {
-                        //tah se dotyka cilove cary:
-                        turns.getTurn(i).setCollision((Point) finish[1]);
-                        actPoint.setLocation(Point.FINISH_LINE);
-                    }
-                } else { //tah vede mimo trat
-                    //kontrola zda hrac pred narazem projede cilem:
-                    Object[] finish = Calc.crossing(act.getLast(), actPoint, track.getFinish());
-                    if ((int) finish[0] != Calc.OUTSIDE && Calc.distance(act.getLast(), (Point) finish[1])
-                            < Calc.distance(act.getLast(), turns.getTurn(i).getCollision())) {
-                        //hrac protne cil pred narazem
-                        turns.getTurn(i).setCollision((Point) finish[1]);
-                        actPoint.setLocation(Point.FINISH);
-                        colision = false;
-                    }
-                }
+
                 if (colision) {
                     turns.getTurn(i).setType(Turns.Turn.COLLISION);
-                    act.setColision(colLine);
+//                    act.setColision(colLine);
                 }
+
             } else {
                 turns.getTurn(i).setExist(false);
             }
         }
+    }
+
+    private boolean checkLeftSideColision(int i, Segment lastFormulaMove) {
+        Polyline left = model.getTrack().getLeft();
+        boolean colision = false;
+
+        for (int k = 0; k < left.getLength() - 1; k++) {
+            Segment actLeft = left.getSegment(k);
+            Object[] cross = Calc.crossing(lastFormulaMove, actLeft);
+            if ((int) cross[0] != Calc.OUTSIDE) {
+                //novy bod ma prunik nebo se dotyka leve krajnice
+                Segment colLine = actLeft;
+                Point colPoint = (Point) cross[1];
+                colPoint.setLocation(Point.COLLISION_LEFT);
+                turns.getTurn(i).setCollision(colPoint);
+                colision = true;
+
+                turns.getTurn(i).setType(Turns.Turn.COLLISION);
+                racers.get(1).setColision(colLine);
+                break;
+            }
+        }
+
+        return colision;
+    }
+
+    private boolean checkRightSideColision(int i, Segment lastFormulaMove) {
+        Polyline right = model.getTrack().getRight();
+        boolean colision = false;
+
+        for (int k = 0; k < right.getLength() - 1; k++) {
+            Segment actRight = right.getSegment(k);
+            Object[] cross = Calc.crossing(lastFormulaMove, actRight);
+            if ((int) cross[0] != Calc.OUTSIDE) {
+                //novy bod ma prunik nebo se dotyka prave krajnice
+                Segment colLine = actRight;
+                Point colPoint = (Point) cross[1];
+                colPoint.setLocation(Point.COLLISION_RIGHT);
+                turns.getTurn(i).setCollision(colPoint);
+                colision = true;
+
+                turns.getTurn(i).setType(Turns.Turn.COLLISION);
+                racers.get(1).setColision(colLine);
+                break;
+            }
+        }
+
+        return colision;
+    }
+
+    private boolean checkStartColision(int i, Segment lastFormulaMove) {
+        Track track = model.getTrack();
+        boolean colision = false;
+
+        Object[] start = Calc.crossing(lastFormulaMove, track.getStart());
+        if ((int) start[0] != Calc.OUTSIDE && Track.RIGHT == Calc.sidePosition(lastFormulaMove.getFirst(), track.getStart())) {
+            //tah protina start a konci vpravo od nej (projel se v protismeru)
+            Point colPoint = (Point) start[1];
+            colPoint.setLocation(Point.COLLISION_RIGHT);
+            turns.getTurn(i).setCollision(colPoint);
+
+            turns.getTurn(i).setType(Turns.Turn.COLLISION);
+            racers.get(1).setColision(track.getStart());
+            colision = true;
+        }
+
+        return colision;
     }
 
     public int getFormulaCount() {

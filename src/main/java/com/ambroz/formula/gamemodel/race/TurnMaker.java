@@ -193,7 +193,7 @@ public class TurnMaker {
     }
 
     /**
-     * It devides possible turns into "clean" and "dirty". Dirty turn means formula crashed. In case that one possible
+     * It divides possible turns into "clean" and "dirty". Dirty turn means formula crashed. In case that one possible
      * turn is equal to rival position, that turns is not allowed.
      *
      * @param rivalLast is position of rival formula

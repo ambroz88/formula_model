@@ -35,6 +35,8 @@ public class TrackBuilder extends TrackEditor {
         super(paper);
         points = new Polyline();
         setupPaper();
+        side = Track.LEFT;
+        setStage(BUILD_LEFT);
     }
 
     private void setupPaper() {
@@ -75,7 +77,7 @@ public class TrackBuilder extends TrackEditor {
     }
 
     private void configureTrackSides() {
-        if (BUILD_LEFT == side) {
+        if (getStage() == BUILD_LEFT) {
             side = Track.LEFT;
             oppSide = Track.RIGHT;
         } else {
@@ -314,29 +316,28 @@ public class TrackBuilder extends TrackEditor {
      */
     public void deletePoint() {
         fireHint(HintLabels.EMPTY);
+        removeLast();
+
         int actSize = getTrack().getLine(side).getLength();
         int oppSize = getTrack().getLine(oppSide).getLength();
 
-        if (actSize > 0) {
-            removeLast();
+        if (actSize == 1) {
+            //when side has just one point, it will be added to list of points that will be draw
+            getPoints().addPoint(getTrack().getLine(side).getLast());
+        } else if (actSize == 0) {
 
-            if (actSize == 1) {
-                //when side has just one point, it will be added to list of points that will be draw
-                getPoints().addPoint(getTrack().getLine(side).getLast());
-            } else if (actSize == 0) {
-
-                //if last point of side is deleted, start points will be generated
-                getPoints().clear();
-                if (oppSize > 0) {
-                    generateStartTurns();
-                }
-
-            } else if (oppSize > 1) {
-                generateFinishTurns();
+            //if last point of side is deleted, start points will be generated
+            getPoints().clear();
+            if (oppSize > 0) {
+                generateStartTurns();
+                getTrack().setIndex(0, oppSide);
             }
 
-            repaintScene();
+        } else if (oppSize > 1) {
+            generateFinishTurns();
         }
+
+        repaintScene();
     }
 
     private void removeLast() {

@@ -23,6 +23,7 @@ public class RaceModel extends CoreModel {
     public RaceModel(Paper gamePaper) {
         super(gamePaper);
         turnMaker = new TurnMaker(this);
+        setStage(FIRST_TURN);
     }
 
     public void moveWithPlayer(Point click) {
@@ -58,9 +59,11 @@ public class RaceModel extends CoreModel {
     }
 
     public void prepareGame(Track track) {
-        setTrack(track);
-        resetGame();
-        fireHint(HintLabels.START_POSITION);
+        if (getTrack() != null) {
+            setTrack(track);
+            resetGame();
+            fireHint(HintLabels.START_POSITION);
+        }
     }
 
     /**
@@ -68,13 +71,6 @@ public class RaceModel extends CoreModel {
      */
     public void resetGame() {
         setStage(FIRST_TURN);
-        resetPlayers();
-    }
-
-    public void endGame() {
-        setStage(FIRST_TURN);
-        firePropertyChange("buildTrack", false, true); // cought by TrackMenu
-        firePropertyChange("startDraw", false, true); // cought by TrackMenu and Draw
         resetPlayers();
     }
 

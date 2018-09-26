@@ -1,9 +1,10 @@
 package com.ambroz.formula.gamemodel.race;
 
+import com.ambroz.formula.gamemodel.datamodel.Collision;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
-import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.enums.FormulaType;
+import com.ambroz.formula.gamemodel.utils.Calc;
 
 /**
  * This class represents formula. It is polyline which has some special functions and variables. In drawing this
@@ -19,7 +20,7 @@ public class Formula extends Polyline {
     private int speed, side, moves, wait;
     private int rgbColor;
     private FormulaType type;
-    private Segment colLine; //two-points line to which this formula crashed
+    private Collision collision;
     private String name;
     private double length; //actual distance which formula took
     private boolean winner;//is true when this formula finished the race
@@ -50,6 +51,12 @@ public class Formula extends Polyline {
     @Override
     public void addPoint(Point p) {
         super.addPoint(p);
+    }
+
+    public void addCollisionPoint() {
+        if (getCollision() != null) {
+            super.addPoint(getCollision().getCollisionPoint());
+        }
     }
 
     public FormulaType getType() {
@@ -92,7 +99,7 @@ public class Formula extends Polyline {
         if (points.size() < 2) {
             return speed;
         } else {
-            return (int) (points.get(points.size() - 1).getY() - points.get(points.size() - 2).getY());
+            return getLast().getY() - getPreLast().getY();
         }
     }
 
@@ -103,14 +110,14 @@ public class Formula extends Polyline {
      * @return number of grid squeres
      */
     public int getSpeed(Point turn) {
-        return (int) (turn.getY() - points.get(points.size() - 1).getY());
+        return turn.getY() - getLast().getY();
     }
 
     public int getSide() {
         if (points.size() < 2) {
             return side;
         } else {
-            return (int) (points.get(points.size() - 1).getX() - points.get(points.size() - 2).getX());
+            return getLast().getX() - getPreLast().getX();
         }
     }
 
@@ -121,21 +128,11 @@ public class Formula extends Polyline {
      * @return number of grid squeres
      */
     public int getSide(Point turn) {
-        if (points.size() < 2) {
-            return side;
-        } else {
-            return (int) (turn.getX() - points.get(points.size() - 1).getX());
-        }
+        return turn.getX() - getLast().getX();
     }
 
     public int maxSpeed() {
-        int maxSpeed = Math.abs((int) (points.get(points.size() - 1).getY() - points.get(points.size() - 2).getY()));
-        int maxSide = Math.abs((int) (points.get(points.size() - 1).getX() - points.get(points.size() - 2).getX()));
-        if (maxSpeed > maxSide) {
-            return maxSpeed;
-        } else {
-            return maxSide;
-        }
+        return maxSpeed(getPreLast());
     }
 
     /**
@@ -145,8 +142,8 @@ public class Formula extends Polyline {
      * @return number of grid squeres
      */
     public int maxSpeed(Point click) {
-        int maxSpeed = Math.abs((int) (click.getY() - points.get(points.size() - 1).getY()));
-        int maxSide = Math.abs((int) (click.getX() - points.get(points.size() - 1).getX()));
+        int maxSpeed = Math.abs(getSpeed(click));
+        int maxSide = Math.abs(getSide(click));
         if (maxSpeed > maxSide) {
             return maxSpeed;
         } else {
@@ -161,8 +158,8 @@ public class Formula extends Polyline {
      * @return number of grid squeres
      */
     public int minSpeed(Point click) {
-        int maxSpeed = Math.abs((int) (click.getY() - points.get(points.size() - 1).getY()));
-        int maxSide = Math.abs((int) (click.getX() - points.get(points.size() - 1).getX()));
+        int maxSpeed = Math.abs(getSpeed(click));
+        int maxSide = Math.abs(getSide(click));
         if (maxSpeed < maxSide) {
             return maxSpeed;
         } else {
@@ -178,8 +175,8 @@ public class Formula extends Polyline {
      * @return String with dominant direction
      */
     public String maxDirect(Point click) {
-        int maxSpeed = Math.abs((int) (click.getY() - points.get(points.size() - 1).getY()));
-        int maxSide = Math.abs((int) (click.getX() - points.get(points.size() - 1).getX()));
+        int maxSpeed = getSpeed(click);
+        int maxSide = getSide(click);
         if (maxSpeed > maxSide) {
             return FORWARD;
         } else {
@@ -187,17 +184,17 @@ public class Formula extends Polyline {
         }
     }
 
-    public void setColision(Segment colLine) {
-        this.colLine = colLine;
+    public void setCollision(Collision colisionObject) {
+        this.collision = colisionObject;
     }
 
     /**
-     * Get colision segment in which the formula crashed (in case of colision)
+     * Get colision object in which the formula crashed (in case of colision)
      *
-     * @return colision segment
+     * @return colision object
      */
-    public Segment getColision() {
-        return colLine;
+    public Collision getCollision() {
+        return collision;
     }
 
     public void setWin(boolean win) {
@@ -219,8 +216,7 @@ public class Formula extends Polyline {
     }
 
     public void movesUp() {
-        moves++;
-        firePropertyChange("move", 0, moves);
+        movesUp(1);
     }
 
     public void movesUp(int count) {
@@ -236,13 +232,7 @@ public class Formula extends Polyline {
      * This method updates the distance of the formula about the distance between two last points.
      */
     public void lengthUp() {
-        Point p1 = points.get(points.size() - 2);
-        Point p2 = points.get(points.size() - 1);
-
-        double dist = Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2)
-                + Math.pow(p2.getY() - p1.getY(), 2));
-        length = length + Math.round(dist * 100.0) / 100.0;
-        firePropertyChange("dist", 0, length);
+        lengthUp(getLast(), getPreLast());
     }
 
     /**
@@ -253,8 +243,7 @@ public class Formula extends Polyline {
      * @param p2 second point
      */
     public void lengthUp(Point p1, Point p2) {
-        double dist = Math.sqrt(Math.pow(p2.getX() - p1.getX(), 2)
-                + Math.pow(p2.getY() - p1.getY(), 2));
+        double dist = Calc.distance(p1, p2);
         length = Math.round((length + dist) * 100.0) / 100.0;
         firePropertyChange("dist", 0, length);
     }

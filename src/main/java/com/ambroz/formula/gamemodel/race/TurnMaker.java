@@ -2,8 +2,8 @@ package com.ambroz.formula.gamemodel.race;
 
 import java.awt.Color;
 import java.util.HashMap;
-import java.util.List;
 
+import com.ambroz.formula.gamemodel.datamodel.Collision;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
@@ -23,26 +23,40 @@ public class TurnMaker {
 
     private final RaceModel model;
     private final HashMap<Integer, Formula> racers;
-    private Turns turns;
+    private final Turns turns;
     private int turnsCount;
-    private int actID;
+    private int formulaID;
 
     public TurnMaker(RaceModel menu) {
         this.model = menu;
-        actID = 1;
+        formulaID = 1;
         racers = new HashMap<>();
-        racers.put(actID, new Formula(FormulaType.Player));
-        getFormula(actID).setColor(Color.BLUE.getRGB());
+        racers.put(formulaID, new Formula(FormulaType.Player));
+        getFormula(formulaID).setColor(Color.BLUE.getRGB());
         turns = new Turns();
         turnsCount = 4;
     }
 
-    public void turn(Point click) {
-        Turns.Turn selectedTurn = turns.containsTurn(click);
+    public void firstTurn(Point click) {
+        Turn selectedTurn = turns.containsTurn(click);
         if (selectedTurn != null) {
 
-            Formula act = getFormula(actID);
-            if (selectedTurn.getType() == Turns.Turn.FREE) {
+            Formula act = getFormula(formulaID);
+            act.addPoint(click);
+            act.addPoint(new Point(click.x + act.getSide(), click.y + act.getSpeed()));
+
+            nextTurn(1, act.getLast());
+            model.setStage(RaceModel.NORMAL_TURN);
+
+        }
+    }
+
+    public void turn(Point click) {
+        Turn selectedTurn = turns.containsTurn(click);
+        if (selectedTurn != null) {
+
+            Formula act = getFormula(formulaID);
+            if (selectedTurn.getType() == Turn.FREE) {
 
                 act.addPoint(click);
                 act.movesUp();
@@ -55,103 +69,13 @@ public class TurnMaker {
         }
     }
 
-    private void checkFinishTurn(Turns.Turn selectedTurn, Point click) {
+    private void checkFinishTurn(Turn selectedTurn, Point click) {
         if (selectedTurn.getPoint().getLocation().contains(Point.FINISH)
                 && Track.LEFT == Calc.sidePosition(click, model.getTrack().getFinish())) {
-            Formula act = getFormula(actID);
-            act.lengthUp(act.getPreLast(), selectedTurn.getCollision());
+            Formula act = getFormula(formulaID);
+            act.lengthUp(act.getPreLast(), selectedTurn.getCollision().getCollisionPoint());
             act.setWin(true);
         }
-    }
-
-    private void handleCrashTurn(Point click, Turns.Turn selectedTurn) {
-        Formula act = getFormula(actID);
-        act.movesUp();
-
-        int maxSpeed = act.maxSpeed(click);
-        act.setWait(maxSpeed + 1);
-        act.movesUp(maxSpeed);
-
-        act.addPoint(selectedTurn.getCollision());
-        act.lengthUp();
-
-        Point crashCenter = generateCrashCenter();
-        act.addPoint(crashCenter);
-        createCrashTurn(crashCenter);
-
-        divideTurns(getFormula(actID).getLast());
-        model.fireCrash(maxSpeed);
-    }
-
-    /**
-     * Metoda najde novy stred po havarii a vykresli nove moznosti novy stred je prunikem kolmice kolizni hrany a
-     * kruznice se stredem v miste kolize a polomerem 0.6*velikost mrizky, pricemz bod musi lezet na trati colision je
-     * bod, ve kterem doslo k vyjeti z trati.
-     */
-    private Point generateCrashCenter() {
-        Formula act = getFormula(actID);
-        Point crashCenter = new Point();
-        Segment collisionLine = act.getColision();
-
-        //smerovy vektor kolizni usecky, ktery se vyuzije pro urceni kolmice
-        double ux = collisionLine.getLast().x - collisionLine.getFirst().x;
-        double uy = collisionLine.getLast().y - collisionLine.getFirst().y;
-
-        if (ux == 0) {
-
-            //crash into vertical edge - for quadratic equation bellow it has no solution
-            if (Point.COLLISION_LEFT.equals(act.getLast().getLocation()) && uy > 0
-                    || Point.COLLISION_RIGHT.equals(act.getLast().getLocation()) && uy < 0) {
-                crashCenter = new Point(act.getLast().getX() - 1, act.getLast().getY());
-            } else {
-                crashCenter = new Point(act.getLast().getX() + 1, act.getLast().getY());
-            }
-
-        } else {
-            //parametr c pro kolmici na kolizni usecku, prochazejici prusecikem:
-            double C = -ux * act.getLast().x - uy * act.getLast().y;
-            /* rovnice pro X na kolmici: X = (-uy*Y-c)/ux
-             * stredova rovnice kruznice: r^2=(x-m)^2 + (y-n)^2
-             * po dosazeni X do stredove rovnice:
-             * (ux^2 + uy^2)* Y^2 + (2*uy*C + 2*m*uy*ux - 2*n*ux^2) * Y + ( C^2 + 2*C*m*ux + ux^2*(n^2+m^2-r^2) ) = 0
-             */
-            double m = act.getLast().x; //X stredu kruznice
-            double n = act.getLast().y; //Y stredu kruznice
-            //parametry kvadraticke rovnice:
-            double a = ux * ux + uy * uy;
-            double b = 2 * uy * C + 2 * m * uy * ux - 2 * n * ux * ux;
-            double c = C * C + 2 * C * m * ux + ux * ux * (n * n + m * m - Math.pow(0.75, 2));
-            //ziskani korenu Y1 a Y2:
-            List<Double> quadRes = Calc.quadratic(a, b, c);
-            double Y1 = quadRes.get(0);
-            double Y2 = quadRes.get(1);
-            //vypocet prislusnych souradnic X na kolmici:
-            double X1 = (-uy * Y1 - C) / ux;
-            double X2 = (-uy * Y2 - C) / ux;
-
-            Point inter1 = new Point(X1, Y1);
-            Point inter2 = new Point(X2, Y2);
-            switch (act.getLast().getLocation()) {
-                case Point.COLLISION_LEFT:
-                    //novy stred musi byt vpravo od kolizni usecky
-                    if (Track.RIGHT == Calc.sidePosition(inter1, act.getColision())) {
-                        crashCenter = new Point(inter1.getX(), inter1.getY());
-                    } else {
-                        crashCenter = new Point(inter2.getX(), inter2.getY());
-                    }
-                    break;
-                case Point.COLLISION_RIGHT:
-                    //novy stred musi byt vlevo od kolizni usecky
-                    if (Track.LEFT == Calc.sidePosition(inter1, act.getColision())) {
-                        crashCenter = new Point(inter1.getX(), inter1.getY());
-                    } else {
-                        crashCenter = new Point(inter2.getX(), inter2.getY());
-                    }
-                    break;
-            }
-        }
-
-        return crashCenter;
     }
 
     /**
@@ -171,27 +95,31 @@ public class TurnMaker {
         Point center = new Point(cenX, cenY);//stred moznosti
 
         //create possibilities of next turn
-        createStandardTurns(center);
+        getTurns().createStandardTurn(center, turnsCount);
         divideTurns(rivalLast);
     }
 
-    private void createStandardTurns(Point center) {
-        turns.reset();
-        if (turnsCount == FOUR_TURNS) {
-            turns.createCornerTurns(center);
-            turns.makeCrashTurnsEmpty();
-            turns.makeCenterTurnEmpty();
-        } else if (turnsCount == FIVE_TURNS) {
-            turns.createCornerTurns(center);
-            turns.createCenterTurn(center);
-            turns.makeCrashTurnsEmpty();
-        } else if (turnsCount == NINE_TURNS) {
-            turns.createCornerTurns(center);
-            turns.createCrashTurns(center);
-            turns.createCenterTurn(center);
-        }
+    private void handleCrashTurn(Point click, Turn selectedTurn) {
+        Formula active = getFormula(formulaID);
+        active.movesUp();
+        active.setCollision(selectedTurn.getCollision());
+
+        int maxSpeed = active.maxSpeed(click);
+        active.setWait(maxSpeed + 1);
+        active.movesUp(maxSpeed);
+
+        active.addCollisionPoint();
+        active.lengthUp();
+
+        Point crashCenter = TurnCalculations.generateCrashCenter(active);
+        active.addPoint(crashCenter);
+        getTurns().createCrashTurn(crashCenter);
+
+        divideTurns(active.getLast());
+        model.fireCrash(maxSpeed);
     }
 
+    //-------------------------- DIVIDE TURNS methods -------------------------
     /**
      * It divides possible turns into "clean" and "dirty". Dirty turn means formula crashed. In case that one possible
      * turn is equal to rival position, that turns is not allowed.
@@ -199,28 +127,28 @@ public class TurnMaker {
      * @param rivalLast is position of rival formula
      */
     private void divideTurns(Point rivalLast) {
-        Point actPoint;
+        Turn selectedTurn;
         Segment lastFormulaMove;
-        Point lastPoint = getFormula(actID).getLast();
+        Point lastPoint = getFormula(formulaID).getLast();
 
         for (int i = 0; i < turns.getSize(); i++) {
-            actPoint = turns.getTurn(i).getPoint();
-            lastFormulaMove = new Segment(actPoint, lastPoint);
+            selectedTurn = turns.getTurn(i);
+            lastFormulaMove = new Segment(selectedTurn.getPoint(), lastPoint);
 
-            if (actPoint.isEqual(rivalLast) == false && turns.getTurn(i).isExist()) {
+            if (selectedTurn.getPoint().isEqual(rivalLast) == false && selectedTurn.isExist()) {
 
-                if (!checkLeftSideColision(i, lastFormulaMove) && !checkRightSideColision(i, lastFormulaMove)) {
-                    checkStartColision(i, lastFormulaMove);
+                if (!checkLeftSideColision(selectedTurn, lastFormulaMove) && !checkRightSideColision(selectedTurn, lastFormulaMove)) {
+                    checkStartColision(selectedTurn, lastFormulaMove);
                 }
 
-                checkFinishCrossing(i, lastFormulaMove);
+                checkFinishCrossing(selectedTurn, lastFormulaMove);
             } else {
-                turns.getTurn(i).setExist(false);
+                selectedTurn.setExist(false);
             }
         }
     }
 
-    private boolean checkLeftSideColision(int i, Segment lastFormulaMove) {
+    private boolean checkLeftSideColision(Turn selectedTurn, Segment lastFormulaMove) {
         Polyline left = model.getTrack().getLeft();
         boolean colision = false;
 
@@ -233,11 +161,10 @@ public class TurnMaker {
                 Segment colLine = actLeft;
                 Point colPoint = (Point) cross[1];
                 colPoint.setLocation(Point.COLLISION_LEFT);
-                turns.getTurn(i).setCollision(colPoint);
+                selectedTurn.setCollision(new Collision(colPoint, colLine));
                 colision = true;
 
-                turns.getTurn(i).setType(Turns.Turn.COLLISION);
-                getFormula(actID).setColision(colLine);
+                selectedTurn.setType(Turn.COLLISION);
                 break;
             }
 
@@ -246,7 +173,7 @@ public class TurnMaker {
         return colision;
     }
 
-    private boolean checkRightSideColision(int i, Segment lastFormulaMove) {
+    private boolean checkRightSideColision(Turn selectedTurn, Segment lastFormulaMove) {
         Polyline right = model.getTrack().getRight();
         boolean colision = false;
 
@@ -259,11 +186,10 @@ public class TurnMaker {
                 Segment colLine = actRight;
                 Point colPoint = (Point) cross[1];
                 colPoint.setLocation(Point.COLLISION_RIGHT);
-                turns.getTurn(i).setCollision(colPoint);
+                selectedTurn.setCollision(new Collision(colPoint, colLine));
                 colision = true;
 
-                turns.getTurn(i).setType(Turns.Turn.COLLISION);
-                getFormula(actID).setColision(colLine);
+                selectedTurn.setType(Turn.COLLISION);
                 break;
             }
         }
@@ -271,7 +197,7 @@ public class TurnMaker {
         return colision;
     }
 
-    private void checkStartColision(int i, Segment lastFormulaMove) {
+    private void checkStartColision(Turn selectedTurn, Segment lastFormulaMove) {
         Segment startLine = model.getTrack().getStart();
 
         Object[] start = Calc.crossing(lastFormulaMove, startLine);
@@ -279,69 +205,48 @@ public class TurnMaker {
             //tah protina start a konci vpravo od nej (projel se v protismeru)
             Point colPoint = (Point) start[1];
             colPoint.setLocation(Point.COLLISION_RIGHT);
-            turns.getTurn(i).setCollision(colPoint);
+            selectedTurn.setCollision(new Collision(colPoint, startLine));
 
-            turns.getTurn(i).setType(Turns.Turn.COLLISION);
-            getFormula(actID).setColision(startLine);
+            selectedTurn.setType(Turn.COLLISION);
         }
 
     }
 
-    private void checkFinishCrossing(int i, Segment lastFormulaMove) {
+    private void checkFinishCrossing(Turn selectedTurn, Segment lastFormulaMove) {
         Track track = model.getTrack();
         Object[] finish = Calc.crossing(lastFormulaMove, track.getFinish());
 
         if ((int) finish[0] == Calc.INSIDE) {
             //tah protina cilovou caru:
-            if (turns.getTurn(i).getCollision() != null) {
-                evalateFinishColision(i, (Point) finish[1]);
+            if (selectedTurn.getCollision() != null) {
+                evalateFinishColision(selectedTurn, (Point) finish[1]);
             } else {
-                turns.getTurn(i).setCollision((Point) finish[1]);
-                turns.getTurn(i).getPoint().setLocation(Point.FINISH);
+                selectedTurn.setCollision(new Collision((Point) finish[1], track.getFinish()));
+                selectedTurn.getPoint().setLocation(Point.FINISH);
             }
         } else if ((int) finish[0] == Calc.EDGE) {
             //tah se dotyka cilove cary:
-            if (turns.getTurn(i).getCollision() != null) {
-                evalateFinishColision(i, (Point) finish[1]);
+            if (selectedTurn.getCollision() != null) {
+                evalateFinishColision(selectedTurn, (Point) finish[1]);
+            } else {
+                selectedTurn.setCollision(new Collision((Point) finish[1], track.getFinish()));
+                selectedTurn.getPoint().setLocation(Point.FINISH_LINE);
             }
-            turns.getTurn(i).setCollision((Point) finish[1]);
-            turns.getTurn(i).getPoint().setLocation(Point.FINISH_LINE);
         }
 
     }
 
-    private void evalateFinishColision(int i, Point finishColision) {
-        if (Calc.distance(getFormula(actID).getLast(), finishColision)
-                < Calc.distance(getFormula(actID).getLast(), turns.getTurn(i).getCollision())) {
+    private void evalateFinishColision(Turn selectedTurn, Point finishColision) {
+        if (Calc.distance(getFormula(formulaID).getLast(), finishColision)
+                < Calc.distance(getFormula(formulaID).getLast(), selectedTurn.getCollision().getCollisionPoint())) {
             //hrac protne cil pred narazem
-            turns.getTurn(i).setCollision(finishColision);
-            turns.getTurn(i).getPoint().setLocation(Point.FINISH);
-            turns.getTurn(i).setType(Turns.Turn.FREE);
-            getFormula(1).setColision(model.getTrack().getFinish());
+            selectedTurn.setCollision(new Collision(finishColision, model.getTrack().getFinish()));
+            selectedTurn.getPoint().setLocation(Point.FINISH);
+            selectedTurn.setType(Turn.FREE);
         }
     }
 
-    private void createCrashTurn(Point center) {
-        turns.reset();
-        turns.createCrashTurns(center);
-        turns.makeCornerTurnsEmpty();
-        turns.makeCenterTurnEmpty();
-    }
-
-    public void firstTurn(Point click) {
-        Turns.Turn selectedTurn = turns.containsTurn(click);
-        if (selectedTurn != null) {
-
-            Formula act = getFormula(actID);
-            act.addPoint(click);
-            act.addPoint(new Point(click.x + act.getSide(), click.y + act.getSpeed()));
-
-            nextTurn(1, act.getLast());
-            model.setStage(RaceModel.NORMAL_TURN);
-
-        }
-    }
-
+    // -------------------------- Creating START POSITIONS ------------------------
     public void startPosition(Segment startLine) {
         Point first = startLine.getFirst();
         Point second = startLine.getLast();
@@ -366,16 +271,16 @@ public class TurnMaker {
     }
 
     private Point createVerticalStartPoints(Point first, Point second) {
-        getFormula(actID).setSpeed(0);
+        getFormula(formulaID).setSpeed(0);
         int startY;
 
         if (second.getY() > first.getY()) {
             //direction of first move will be to the right
-            getFormula(actID).setSide(1);
+            getFormula(formulaID).setSide(1);
             startY = first.getY();
         } else {
             //direction of first move will be to the left
-            getFormula(actID).setSide(-1);
+            getFormula(formulaID).setSide(-1);
             startY = second.getY();
         }
 
@@ -383,22 +288,23 @@ public class TurnMaker {
     }
 
     private Point createHorizontalStartPositions(Point first, Point second) {
-        getFormula(actID).setSide(0);
+        getFormula(formulaID).setSide(0);
         int startX;
 
         if (second.getX() > first.getX()) {
             //direction of first move will be down
-            getFormula(actID).setSpeed(-1);
+            getFormula(formulaID).setSpeed(-1);
             startX = first.getX();
         } else {
             //direction of first move will be up
-            getFormula(actID).setSpeed(1);
+            getFormula(formulaID).setSpeed(1);
             startX = second.getX();
         }
 
         return new Point(startX, first.getY());
     }
 
+    //---------------------------------------------------------------------------
     public int getFormulaCount() {
         return racers.size();
     }
@@ -409,6 +315,10 @@ public class TurnMaker {
 
     public void resetTurns() {
         turns.reset();
+    }
+
+    public void setTurnsCount(int turnsCount) {
+        this.turnsCount = turnsCount;
     }
 
     public Turns getTurns() {

@@ -70,25 +70,63 @@ public class Turns {
         return confirmed;
     }
 
-    public void createCornerTurns(Point center) {
+    // ----------------------- Create turn types -------------------------
+    public void createStandardTurn(Point center, int turnsCount) {
+        reset();
+        if (turnsCount == TurnMaker.FOUR_TURNS) {
+            createFourTurn(center);
+        } else if (turnsCount == TurnMaker.FIVE_TURNS) {
+            createFiveTurn(center);
+        } else if (turnsCount == TurnMaker.NINE_TURNS) {
+            createNineTurn(center);
+        }
+    }
+
+    public void createCrashTurn(Point center) {
+        reset();
+        createCrashTurns(center);
+        makeCornerTurnsEmpty();
+        makeCenterTurnEmpty();
+    }
+
+    private void createFourTurn(Point center) {
+        createCornerTurns(center);
+        makeCrashTurnsEmpty();
+        makeCenterTurnEmpty();
+    }
+
+    private void createFiveTurn(Point center) {
+        createCornerTurns(center);
+        createCenterTurn(center);
+        makeCrashTurnsEmpty();
+    }
+
+    private void createNineTurn(Point center) {
+        createCornerTurns(center);
+        createCrashTurns(center);
+        createCenterTurn(center);
+    }
+
+    // ---------------------- executive turn methods -------------------------------------
+    private void createCornerTurns(Point center) {
         getTurn(0).setPoint(new Point(center.x - 1, center.y - 1));
         getTurn(2).setPoint(new Point(center.x + 1, center.y - 1));
         getTurn(6).setPoint(new Point(center.x - 1, center.y + 1));
         getTurn(8).setPoint(new Point(center.x + 1, center.y + 1));
     }
 
-    public void createCrashTurns(Point center) {
+    private void createCrashTurns(Point center) {
         getTurn(1).setPoint(new Point(center.x, center.y - 1));
         getTurn(3).setPoint(new Point(center.x - 1, center.y));
         getTurn(5).setPoint(new Point(center.x + 1, center.y));
         getTurn(7).setPoint(new Point(center.x, center.y + 1));
     }
 
-    public void createCenterTurn(Point center) {
+    private void createCenterTurn(Point center) {
         getTurn(4).setPoint(center);
     }
 
-    public void makeCrashTurnsEmpty() {
+    private void makeCrashTurnsEmpty() {
         getTurn(1).setExist(false);
         getTurn(3).setExist(false);
         getTurn(5).setExist(false);
@@ -96,17 +134,18 @@ public class Turns {
 
     }
 
-    public void makeCornerTurnsEmpty() {
+    private void makeCornerTurnsEmpty() {
         getTurn(0).setExist(false);
         getTurn(2).setExist(false);
         getTurn(6).setExist(false);
         getTurn(8).setExist(false);
     }
 
-    public void makeCenterTurnEmpty() {
+    private void makeCenterTurnEmpty() {
         getTurn(4).setExist(false);
     }
 
+    //-----------------------------------------------------------------
     public Turn getTurn(int pos) {
         return turns[pos];
     }
@@ -125,57 +164,6 @@ public class Turns {
     @Override
     public String toString() {
         return "Size: " + turns.length;
-    }
-
-    public class Turn {
-
-        public static final int FREE = 1;
-        public static final int COLLISION = 0;
-        private Point point;
-        private Point collision;
-        private int type; //0 is bad, 1 is good
-        private boolean exist;
-
-        public Turn() {
-            point = new Point();
-            type = FREE;
-            exist = true;
-        }
-
-        public Point getPoint() {
-            return point;
-        }
-
-        public void setPoint(Point point) {
-            this.point = point;
-            setExist(true);
-        }
-
-        public Point getCollision() {
-            return collision;
-        }
-
-        public void setCollision(Point collision) {
-            this.collision = collision;
-        }
-
-        public int getType() {
-            return type;
-        }
-
-        public void setType(int type) {
-            this.type = type;
-            setExist(true);
-        }
-
-        public boolean isExist() {
-            return exist;
-        }
-
-        public void setExist(boolean exist) {
-            this.exist = exist;
-        }
-
     }
 
 }

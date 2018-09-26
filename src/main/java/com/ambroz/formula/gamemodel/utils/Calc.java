@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
+import com.ambroz.formula.gamemodel.race.Turn;
 import com.ambroz.formula.gamemodel.track.Track;
 import com.ambroz.formula.gamemodel.race.Turns;
 
@@ -199,7 +200,7 @@ public abstract class Calc {
      * @param data is list of points where is searched the closest one
      * @return the nearest point in the list
      */
-    public static Point findNearestTurn(Point sourcePoint, List<Turns.Turn> data) {
+    public static Point findNearestTurn(Point sourcePoint, List<Turn> data) {
         int minIndex = 0;
         for (int i = 1; i < data.size(); i++) {
             if (distance(sourcePoint, data.get(minIndex).getPoint()) > distance(sourcePoint, data.get(i).getPoint())) {

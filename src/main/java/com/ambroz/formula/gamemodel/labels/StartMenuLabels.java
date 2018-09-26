@@ -13,10 +13,8 @@ import com.ambroz.formula.gamemodel.utils.FileIO;
  */
 public class StartMenuLabels {
 
-    public final static String START = "start";
     public final static String START_GAME = "newGame";
     public final static String START_AGAIN = "startAgain";
-    public final static String QUIT = "quit";
 
     private Properties properties;
 

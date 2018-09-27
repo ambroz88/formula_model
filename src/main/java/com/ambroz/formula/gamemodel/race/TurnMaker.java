@@ -45,7 +45,7 @@ public class TurnMaker {
             act.addPoint(click);
             act.addPoint(new Point(click.x + act.getSide(), click.y + act.getSpeed()));
 
-            nextTurn(1, act.getLast());
+            nextTurn(formulaID, act.getLast());
             model.setStage(RaceModel.NORMAL_TURN);
 
         }
@@ -56,12 +56,12 @@ public class TurnMaker {
         if (selectedTurn != null) {
 
             Formula act = getFormula(formulaID);
-            if (selectedTurn.getType() == Turn.FREE) {
+            if (selectedTurn.getCollision() == null || selectedTurn.getLocation().contains("finish")) {
 
                 act.addPoint(click);
                 act.movesUp();
                 checkFinishTurn(selectedTurn, click);
-                nextTurn(1, act.getLast());
+                nextTurn(formulaID, act.getLast());
 
             } else {
                 handleCrashTurn(click, selectedTurn);
@@ -70,7 +70,7 @@ public class TurnMaker {
     }
 
     private void checkFinishTurn(Turn selectedTurn, Point click) {
-        if (selectedTurn.getPoint().getLocation().contains(Point.FINISH)
+        if (selectedTurn.getLocation().contains(Point.FINISH)
                 && Track.LEFT == Calc.sidePosition(click, model.getTrack().getFinish())) {
             Formula act = getFormula(formulaID);
             act.lengthUp(act.getPreLast(), selectedTurn.getCollision().getCollisionPoint());
@@ -85,16 +85,7 @@ public class TurnMaker {
      * @param rivalLast last point of other player
      */
     private void nextTurn(int formOnTurn, Point rivalLast) {
-        Formula act = racers.get(formOnTurn);
-        int side = act.getSide();
-        int speed = act.getSpeed();
-
-        //souradnice noveho stredu
-        int cenX = act.getLast().getX() + side;
-        int cenY = act.getLast().getY() + speed;
-        Point center = new Point(cenX, cenY);//stred moznosti
-
-        //create possibilities of next turn
+        Point center = racers.get(formOnTurn).calculateNextCenter();
         getTurns().createStandardTurn(center, turnsCount);
         divideTurns(rivalLast);
     }
@@ -133,9 +124,9 @@ public class TurnMaker {
 
         for (int i = 0; i < turns.getSize(); i++) {
             selectedTurn = turns.getTurn(i);
-            lastFormulaMove = new Segment(selectedTurn.getPoint(), lastPoint);
+            lastFormulaMove = new Segment(selectedTurn, lastPoint);
 
-            if (selectedTurn.getPoint().isEqual(rivalLast) == false && selectedTurn.isExist()) {
+            if (selectedTurn.isEqual(rivalLast) == false && selectedTurn.isExist()) {
 
                 if (!checkLeftSideColision(selectedTurn, lastFormulaMove) && !checkRightSideColision(selectedTurn, lastFormulaMove)) {
                     checkStartColision(selectedTurn, lastFormulaMove);
@@ -163,8 +154,6 @@ public class TurnMaker {
                 colPoint.setLocation(Point.COLLISION_LEFT);
                 selectedTurn.setCollision(new Collision(colPoint, colLine));
                 colision = true;
-
-                selectedTurn.setType(Turn.COLLISION);
                 break;
             }
 
@@ -188,8 +177,6 @@ public class TurnMaker {
                 colPoint.setLocation(Point.COLLISION_RIGHT);
                 selectedTurn.setCollision(new Collision(colPoint, colLine));
                 colision = true;
-
-                selectedTurn.setType(Turn.COLLISION);
                 break;
             }
         }
@@ -206,8 +193,6 @@ public class TurnMaker {
             Point colPoint = (Point) start[1];
             colPoint.setLocation(Point.COLLISION_RIGHT);
             selectedTurn.setCollision(new Collision(colPoint, startLine));
-
-            selectedTurn.setType(Turn.COLLISION);
         }
 
     }
@@ -222,7 +207,7 @@ public class TurnMaker {
                 evalateFinishColision(selectedTurn, (Point) finish[1]);
             } else {
                 selectedTurn.setCollision(new Collision((Point) finish[1], track.getFinish()));
-                selectedTurn.getPoint().setLocation(Point.FINISH);
+                selectedTurn.setLocation(Point.FINISH);
             }
         } else if ((int) finish[0] == Calc.EDGE) {
             //tah se dotyka cilove cary:
@@ -230,7 +215,7 @@ public class TurnMaker {
                 evalateFinishColision(selectedTurn, (Point) finish[1]);
             } else {
                 selectedTurn.setCollision(new Collision((Point) finish[1], track.getFinish()));
-                selectedTurn.getPoint().setLocation(Point.FINISH_LINE);
+                selectedTurn.setLocation(Point.FINISH_LINE);
             }
         }
 
@@ -241,8 +226,8 @@ public class TurnMaker {
                 < Calc.distance(getFormula(formulaID).getLast(), selectedTurn.getCollision().getCollisionPoint())) {
             //hrac protne cil pred narazem
             selectedTurn.setCollision(new Collision(finishColision, model.getTrack().getFinish()));
-            selectedTurn.getPoint().setLocation(Point.FINISH);
-            selectedTurn.setType(Turn.FREE);
+            selectedTurn.setLocation(Point.FINISH);
+//            selectedTurn.setType(Turn.FREE);
         }
     }
 

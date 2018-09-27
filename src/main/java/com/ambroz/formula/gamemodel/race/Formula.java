@@ -184,6 +184,17 @@ public class Formula extends Polyline {
         }
     }
 
+    /**
+     * It calculates next center of possible turns based on last turn.
+     *
+     * @return center point
+     */
+    public Point calculateNextCenter() {
+        int cenX = getLast().getX() + getSide();
+        int cenY = getLast().getY() + getSpeed();
+        return new Point(cenX, cenY);
+    }
+
     public void setCollision(Collision colisionObject) {
         this.collision = colisionObject;
     }

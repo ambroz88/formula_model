@@ -20,40 +20,22 @@ public class Turns {
         }
     }
 
-    public List<Point> getFreePoints() {
-        List<Point> freePoints = new ArrayList<>();
-        for (Turn turn : turns) {
-            if (turn.isExist() && turn.getType() == Turn.FREE) {
-                freePoints.add(turn.getPoint());
-            }
-        }
-        return freePoints;
-    }
-
     public List<Turn> getFreeTurns() {
         List<Turn> freeTurns = new ArrayList<>();
         for (Turn turn : turns) {
-            if (turn.isExist() && turn.getType() == Turn.FREE) {
+            if (turn.isExist() && turn.getCollision() == null || turn.getLocation().contains("finish")) {
                 freeTurns.add(turn);
+            } else {
+
             }
         }
         return freeTurns;
     }
 
-    public List<Point> getCollisionPoints() {
-        List<Point> collisionPoints = new ArrayList<>();
-        for (Turn turn : turns) {
-            if (turn.isExist() && turn.getType() == Turn.COLLISION) {
-                collisionPoints.add(turn.getPoint());
-            }
-        }
-        return collisionPoints;
-    }
-
     public List<Turn> getCollisionTurns() {
         List<Turn> collisionTurns = new ArrayList<>();
         for (Turn turn : turns) {
-            if (turn.isExist() && turn.getType() == Turn.COLLISION) {
+            if (turn.isExist() && turn.getCollision() != null && !turn.getLocation().contains("finish")) {
                 collisionTurns.add(turn);
             }
         }
@@ -63,7 +45,7 @@ public class Turns {
     public Turn containsTurn(Point click) {
         Turn confirmed = null;
         for (Turn turn : turns) {
-            if (click.isEqual(turn.getPoint())) {
+            if (click.isEqual(turn)) {
                 confirmed = turn;
             }
         }

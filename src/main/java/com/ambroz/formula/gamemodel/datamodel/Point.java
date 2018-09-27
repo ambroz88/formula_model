@@ -44,6 +44,14 @@ public class Point {
         return (int) Math.round(y);
     }
 
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
     /**
      * It converts panel coordinates into grid coordinates.
      * <br>Examples of conversions when grid size is 10:
@@ -67,11 +75,6 @@ public class Point {
      */
     public boolean isEqual(Point p) {
         return x == p.getX() && y == p.getY();
-    }
-
-    public void setPoint(Point p) {
-        x = p.x;
-        y = p.y;
     }
 
     /**

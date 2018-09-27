@@ -7,7 +7,6 @@ import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.race.Turn;
 import com.ambroz.formula.gamemodel.track.Track;
-import com.ambroz.formula.gamemodel.race.Turns;
 
 /**
  * This is a class with different matematical operations and methods which are static.
@@ -21,14 +20,13 @@ public abstract class Calc {
     public static final int INSIDE = 1;
 
     /**
-     * This method finds out if two segments have intersect. Each segment is defined by Segment
-     * object. It doesn't matter on order.
+     * This method finds out if two segments have intersect. Each segment is defined by Segment object. It doesn't
+     * matter on order.
      *
      * @param segment1 is first segment (polyline with length = 2)
      * @param segment2 is second segment (polyline with length = 2)
-     * @return ArrayList of length 2. First value is Integer which means if there is intersect (1
-     * for intersect, 0 for touch and -1 for no intersect. Second value in List is Point where is
-     * the intersect.
+     * @return ArrayList of length 2. First value is Integer which means if there is intersect (1 for intersect, 0 for
+     * touch and -1 for no intersect. Second value in List is Point where is the intersect.
      */
     public static Object[] crossing(Segment segment1, Segment segment2) {
         int intersect = OUTSIDE;
@@ -51,31 +49,29 @@ public abstract class Calc {
     }
 
     /**
-     * This method finds out if two segments have intersect. One segment is defined by two separated
-     * points. Second segment is defined by Segment.
+     * This method finds out if two segments have intersect. One segment is defined by two separated points. Second
+     * segment is defined by Segment.
      *
      * @param a is first point of first segment
      * @param b is second point of first segment
      * @param segment is segment (polyline with length = 2)
-     * @return ArrayList of length 2. First value is Integer which means if there is intersect (1
-     * for intersect, 0 for touch and -1 for no intersect. Second value in List is Point where is
-     * the intersect.
+     * @return ArrayList of length 2. First value is Integer which means if there is intersect (1 for intersect, 0 for
+     * touch and -1 for no intersect. Second value in List is Point where is the intersect.
      */
     public static Object[] crossing(Point a, Point b, Segment segment) {
         return crossing(new Segment(a, b), segment);
     }
 
     /**
-     * This method finds out if two segments have intersect. Both segments are defined by two
-     * separated points. It doesn't matter on direction of the segment.
+     * This method finds out if two segments have intersect. Both segments are defined by two separated points. It
+     * doesn't matter on direction of the segment.
      *
      * @param a is first point of first segment
      * @param b is second point of first segment
      * @param c is first point of second segment
      * @param d is second point of second segment
-     * @return ArrayList of length 2. First value is Integer which means if there is intersect (1
-     * for intersect, 0 for touch and -1 for no intersect. Second value in List is Point where is
-     * the intersect.
+     * @return ArrayList of length 2. First value is Integer which means if there is intersect (1 for intersect, 0 for
+     * touch and -1 for no intersect. Second value in List is Point where is the intersect.
      */
     public static Object[] crossing(Point a, Point b, Point c, Point d) {
         return crossing(a, b, new Segment(c, d));
@@ -131,8 +127,7 @@ public abstract class Calc {
      *
      * @param segment is segment where the point will be compared
      * @param inter
-     * @return - hodnoty: 1 pro polohu uvnitr usecky, 0 pro polohu na kraji a -1 kdyz lezi mimo
-     * usecku
+     * @return - hodnoty: 1 pro polohu uvnitr usecky, 0 pro polohu na kraji a -1 kdyz lezi mimo usecku
      */
     public static int pointPosition(Segment segment, Point inter) {
         Point a = segment.getFirst();
@@ -175,8 +170,8 @@ public abstract class Calc {
     }
 
     /**
-     * This method finds the nearest point from the list of Points where the nearest one is
-     * calculated from the point 'sourcePoint'.
+     * This method finds the nearest point from the list of Points where the nearest one is calculated from the point
+     * 'sourcePoint'.
      *
      * @param sourcePoint is the point from which the distance is measure
      * @param data is list of points where is searched the closest one
@@ -193,8 +188,8 @@ public abstract class Calc {
     }
 
     /**
-     * This method finds the nearest point from the list of Points where the nearest one is
-     * calculated from the point 'sourcePoint'.
+     * This method finds the nearest point from the list of Points where the nearest one is calculated from the point
+     * 'sourcePoint'.
      *
      * @param sourcePoint is the point from which the distance is measure
      * @param data is list of points where is searched the closest one
@@ -203,16 +198,16 @@ public abstract class Calc {
     public static Point findNearestTurn(Point sourcePoint, List<Turn> data) {
         int minIndex = 0;
         for (int i = 1; i < data.size(); i++) {
-            if (distance(sourcePoint, data.get(minIndex).getPoint()) > distance(sourcePoint, data.get(i).getPoint())) {
+            if (distance(sourcePoint, data.get(minIndex)) > distance(sourcePoint, data.get(i))) {
                 minIndex = i;
             }
         }
-        return data.get(minIndex).getPoint();
+        return data.get(minIndex);
     }
 
     /**
-     * This method finds position of the nearest point from the list of Points. The nearest one is
-     * calculated from the point 'sourcePoint'.
+     * This method finds position of the nearest point from the list of Points. The nearest one is calculated from the
+     * point 'sourcePoint'.
      *
      * @param sourcePoint is the point from which the distance is measure
      * @param data is list of points where is searched the closest one
@@ -229,14 +224,13 @@ public abstract class Calc {
     }
 
     /**
-     * This method create point in the angle axis which is given by tree points. It is possible to
-     * say on which side that point should be create.
+     * This method create point in the angle axis which is given by tree points. It is possible to say on which side
+     * that point should be create.
      *
      * @param prev is first point
      * @param mid is second point
      * @param next is third point
-     * @param side is side from polyline where new point should be created (1 means left, 2 means
-     * right)
+     * @param side is side from polyline where new point should be created (1 means left, 2 means right)
      * @return point in the angle axis on given side from polyline
      */
     public static Point calculateAngle(Point prev, Point mid, Point next, int side) {
@@ -260,8 +254,8 @@ public abstract class Calc {
     }
 
     /**
-     * This method rotates one point around another point. Parameters of this rotation are: angle
-     * and new distance from center of rotation.
+     * This method rotates one point around another point. Parameters of this rotation are: angle and new distance from
+     * center of rotation.
      *
      * @param rotated is point which is rotated
      * @param center is central point of rotation
@@ -379,8 +373,7 @@ public abstract class Calc {
     }
 
     /**
-     * Metoda zjisti, na jake strane lezi bod center od kolizni usecky. Poloha na usecce je zahrnuta
-     * do polohy vpravo.
+     * Metoda zjisti, na jake strane lezi bod center od kolizni usecky. Poloha na usecce je zahrnuta do polohy vpravo.
      *
      * @param center vstupni porovnavany bod
      * @param colLine kolizni usecka, od ktere se uvazuje poloha bodu

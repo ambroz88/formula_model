@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ambroz.formula.gamemodel.datamodel.Point;
+import com.ambroz.formula.gamemodel.enums.PointPosition;
 
 /**
  *
@@ -23,7 +24,7 @@ public class Turns {
     public List<Turn> getFreeTurns() {
         List<Turn> freeTurns = new ArrayList<>();
         for (Turn turn : turns) {
-            if (turn.isExist() && turn.getCollision() == null || turn.getLocation().contains("finish")) {
+            if (turn.isExist() && turn.getCollision() == null || turn.getPosition().contains(PointPosition.Finish)) {
                 freeTurns.add(turn);
             } else {
 
@@ -35,7 +36,7 @@ public class Turns {
     public List<Turn> getCollisionTurns() {
         List<Turn> collisionTurns = new ArrayList<>();
         for (Turn turn : turns) {
-            if (turn.isExist() && turn.getCollision() != null && !turn.getLocation().contains("finish")) {
+            if (turn.isExist() && turn.getCollision() != null && !turn.getPosition().contains(PointPosition.Finish)) {
                 collisionTurns.add(turn);
             }
         }

@@ -6,6 +6,7 @@ import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
+import com.ambroz.formula.gamemodel.enums.PointPosition;
 import com.ambroz.formula.gamemodel.labels.HintLabels;
 import com.ambroz.formula.gamemodel.utils.Calc;
 import com.ambroz.formula.gamemodel.utils.TrackIO;
@@ -175,7 +176,7 @@ public class TrackBuilder extends TrackEditor {
         Segment trackEnd = new Segment(actLine.getLast(), oppLine.getPoint(getTrack().getIndex(oppSide)));
         boolean success = true;
 
-        if ((int) Calc.crossing(actLine.getLast(), click, getTrack().getStart())[0] == Calc.INSIDE) {
+        if (Calc.intersectSegments(actLine.getLast(), click, getTrack().getStart()).getPosition().equals(PointPosition.Inside)) {
             message = HintLabels.THROUGH_START;
             success = false;
         } else if (actLine.getLength() == 1 && Calc.sidePosition(click, trackEnd) != side) {
@@ -193,43 +194,53 @@ public class TrackBuilder extends TrackEditor {
         } else if (!correctDirection(actLine, click)) {
             //check bad direction of constructed side
             success = false;
-        } else if (getTrack().freeDrawing(side, oppSide)) {
-            success = true;
-        } else {
-            //turn is OK but it is necessary to check "building index" on opposite side
-            boolean search = true;
-            Point prev, center, next, sidePoint;
-            int index = getTrack().getIndex(oppSide);
-            while (search) {
+        } else if (!getTrack().freeDrawing(side, oppSide)) {
+            calculateTrackIndexes(click);
+        }
+
+        return success;
+    }
+
+    private void calculateTrackIndexes(Point click) {
+        //turn is OK but it is necessary to check "building index" on opposite side
+        Polyline actLine = getTrack().getLine(side);
+        Polyline oppLine = getTrack().getLine(oppSide);
+
+        boolean search = true;
+        Point prev;
+        Point center;
+        Point next;
+        Point sidePoint;
+        int index = getTrack().getIndex(oppSide);
+
+        while (search) {
+
+            if (index > oppLine.getLength() - 2) {
+                search = false;
+            } else {
+
                 if (index < oppLine.getLength() - 2) {
                     //create next segment that should be crossed by point click:
                     prev = oppLine.getPoint(index);
                     center = oppLine.getPoint(index + 1);
                     next = oppLine.getPoint(index + 2);
-                    sidePoint = Calc.calculateAngle(prev, center, next, side);
-
-                    if ((int) Calc.crossing(actLine.getLast(), click, center, sidePoint)[0] >= Calc.EDGE) {
-                        //point click went through "control segment"
-                        getTrack().setIndex(index + 1, oppSide);
-                    }
-                } else if (index == oppLine.getLength() - 2) {
+                } else {
                     prev = oppLine.getPoint(index - 1);
                     center = oppLine.getPoint(index);
                     next = oppLine.getPoint(index + 1);
-                    sidePoint = Calc.calculateAngle(prev, center, next, side);
-
-                    if ((int) Calc.crossing(actLine.getLast(), click, center, sidePoint)[0] >= Calc.EDGE) {
-                        //point click went through "control segment"
-                        getTrack().setIndex(index + 1, oppSide);
-                    }
-                } else {
-                    search = false;
                 }
-                index++;
+
+                sidePoint = Calc.calculateAngle(prev, center, next, side);
+
+                if (Calc.intersectSegments(actLine.getLast(), click, center, sidePoint).getPosition().contains(PointPosition.Inside)) {
+                    //point click went through "control segment"
+                    getTrack().setIndex(index + 1, oppSide);
+                }
             }
-            getTrack().setIndex(actLine.getLength(), side);
+            index++;
+
         }
-        return success;
+        getTrack().setIndex(actLine.getLength(), side);
     }
 
     /**

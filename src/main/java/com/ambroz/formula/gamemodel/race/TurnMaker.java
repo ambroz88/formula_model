@@ -8,6 +8,7 @@ import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.enums.FormulaType;
+import com.ambroz.formula.gamemodel.enums.PointPosition;
 import com.ambroz.formula.gamemodel.track.Track;
 import com.ambroz.formula.gamemodel.utils.Calc;
 
@@ -56,7 +57,7 @@ public class TurnMaker {
         if (selectedTurn != null) {
 
             Formula act = getFormula(formulaID);
-            if (selectedTurn.getCollision() == null || selectedTurn.getLocation().contains("finish")) {
+            if (selectedTurn.getCollision() == null || selectedTurn.getPosition().contains(PointPosition.Finish)) {
 
                 act.addPoint(click);
                 act.movesUp();
@@ -70,7 +71,7 @@ public class TurnMaker {
     }
 
     private void checkFinishTurn(Turn selectedTurn, Point click) {
-        if (selectedTurn.getLocation().contains(Point.FINISH)
+        if (selectedTurn.getPosition().contains(PointPosition.Finish)
                 && Track.LEFT == Calc.sidePosition(click, model.getTrack().getFinish())) {
             Formula act = getFormula(formulaID);
             act.lengthUp(act.getPreLast(), selectedTurn.getCollision().getCollisionPoint());
@@ -145,14 +146,13 @@ public class TurnMaker {
 
         for (int k = 0; k < left.getLength() - 1; k++) {
             Segment actLeft = left.getSegment(k);
-            Object[] cross = Calc.crossing(lastFormulaMove, actLeft);
+            Point cross = Calc.intersectSegments(lastFormulaMove, actLeft);
 
-            if ((int) cross[0] != Calc.OUTSIDE) {
+            if (!cross.getPosition().equals(PointPosition.Outside)) {
                 //novy bod ma prunik nebo se dotyka leve krajnice
                 Segment colLine = actLeft;
-                Point colPoint = (Point) cross[1];
-                colPoint.setLocation(Point.COLLISION_LEFT);
-                selectedTurn.setCollision(new Collision(colPoint, colLine));
+                cross.setPosition(PointPosition.CollisionLeft);
+                selectedTurn.setCollision(new Collision(cross, colLine));
                 colision = true;
                 break;
             }
@@ -168,14 +168,13 @@ public class TurnMaker {
 
         for (int k = 0; k < right.getLength() - 1; k++) {
             Segment actRight = right.getSegment(k);
-            Object[] cross = Calc.crossing(lastFormulaMove, actRight);
+            Point cross = Calc.intersectSegments(lastFormulaMove, actRight);
 
-            if ((int) cross[0] != Calc.OUTSIDE) {
+            if (!cross.getPosition().equals(PointPosition.Outside)) {
                 //novy bod ma prunik nebo se dotyka prave krajnice
                 Segment colLine = actRight;
-                Point colPoint = (Point) cross[1];
-                colPoint.setLocation(Point.COLLISION_RIGHT);
-                selectedTurn.setCollision(new Collision(colPoint, colLine));
+                cross.setPosition(PointPosition.CollisionRight);
+                selectedTurn.setCollision(new Collision(cross, colLine));
                 colision = true;
                 break;
             }
@@ -187,35 +186,34 @@ public class TurnMaker {
     private void checkStartColision(Turn selectedTurn, Segment lastFormulaMove) {
         Segment startLine = model.getTrack().getStart();
 
-        Object[] start = Calc.crossing(lastFormulaMove, startLine);
-        if ((int) start[0] != Calc.OUTSIDE && Track.RIGHT == Calc.sidePosition(lastFormulaMove.getFirst(), startLine)) {
+        Point start = Calc.intersectSegments(lastFormulaMove, startLine);
+        if (!start.getPosition().equals(PointPosition.Outside) && Track.RIGHT == Calc.sidePosition(lastFormulaMove.getFirst(), startLine)) {
             //tah protina start a konci vpravo od nej (projel se v protismeru)
-            Point colPoint = (Point) start[1];
-            colPoint.setLocation(Point.COLLISION_RIGHT);
-            selectedTurn.setCollision(new Collision(colPoint, startLine));
+            start.setPosition(PointPosition.CollisionRight);
+            selectedTurn.setCollision(new Collision(start, startLine));
         }
 
     }
 
     private void checkFinishCrossing(Turn selectedTurn, Segment lastFormulaMove) {
         Track track = model.getTrack();
-        Object[] finish = Calc.crossing(lastFormulaMove, track.getFinish());
+        Point finish = Calc.intersectSegments(lastFormulaMove, track.getFinish());
 
-        if ((int) finish[0] == Calc.INSIDE) {
+        if (finish.getPosition().equals(PointPosition.Inside)) {
             //tah protina cilovou caru:
             if (selectedTurn.getCollision() != null) {
-                evalateFinishColision(selectedTurn, (Point) finish[1]);
+                evalateFinishColision(selectedTurn, finish);
             } else {
-                selectedTurn.setCollision(new Collision((Point) finish[1], track.getFinish()));
-                selectedTurn.setLocation(Point.FINISH);
+                selectedTurn.setCollision(new Collision(finish, track.getFinish()));
+                selectedTurn.setPosition(PointPosition.Finish);
             }
-        } else if ((int) finish[0] == Calc.EDGE) {
+        } else if (finish.getPosition().equals(PointPosition.Edge)) {
             //tah se dotyka cilove cary:
             if (selectedTurn.getCollision() != null) {
-                evalateFinishColision(selectedTurn, (Point) finish[1]);
+                evalateFinishColision(selectedTurn, finish);
             } else {
-                selectedTurn.setCollision(new Collision((Point) finish[1], track.getFinish()));
-                selectedTurn.setLocation(Point.FINISH_LINE);
+                selectedTurn.setCollision(new Collision(finish, track.getFinish()));
+                selectedTurn.setPosition(PointPosition.FinishLine);
             }
         }
 
@@ -226,7 +224,7 @@ public class TurnMaker {
                 < Calc.distance(getFormula(formulaID).getLast(), selectedTurn.getCollision().getCollisionPoint())) {
             //hrac protne cil pred narazem
             selectedTurn.setCollision(new Collision(finishColision, model.getTrack().getFinish()));
-            selectedTurn.setLocation(Point.FINISH);
+            selectedTurn.setPosition(PointPosition.Finish);
 //            selectedTurn.setType(Turn.FREE);
         }
     }
@@ -308,6 +306,14 @@ public class TurnMaker {
 
     public Turns getTurns() {
         return turns;
+    }
+
+    public int getFormulaID() {
+        return formulaID;
+    }
+
+    public void setFormulaID(int id) {
+        this.formulaID = id;
     }
 
 }

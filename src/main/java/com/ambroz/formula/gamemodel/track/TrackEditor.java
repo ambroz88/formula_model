@@ -4,6 +4,7 @@ import com.ambroz.formula.gamemodel.datamodel.CoreModel;
 import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
+import com.ambroz.formula.gamemodel.enums.PointPosition;
 import com.ambroz.formula.gamemodel.labels.HintLabels;
 import com.ambroz.formula.gamemodel.utils.Calc;
 
@@ -113,8 +114,8 @@ public class TrackEditor extends CoreModel {
                 if (i < movePointIndex - 1 || i > movePointIndex) {
 
                     Segment actRight = getTrack().getLine(side).getSegment(i);
-                    if ((int) Calc.crossing(click, newEdgeStart, actRight)[0] == Calc.INSIDE
-                            || (int) Calc.crossing(click, newEdgeEnd, actRight)[0] == Calc.INSIDE) {
+                    if (Calc.intersectSegments(click, newEdgeStart, actRight).getPosition().equals(PointPosition.Inside)
+                            || Calc.intersectSegments(click, newEdgeEnd, actRight).getPosition().equals(PointPosition.Inside)) {
                         intersect = true;
                     }
 
@@ -135,12 +136,12 @@ public class TrackEditor extends CoreModel {
         boolean intersect = false;
         if (getTrack().getStart() != null) {
 
-            if ((int) Calc.crossing(edgeStart, click, getTrack().getStart())[0] == Calc.INSIDE
-                    || (int) Calc.crossing(edgeEnd, click, getTrack().getStart())[0] == Calc.INSIDE) {
+            if (Calc.intersectSegments(edgeStart, click, getTrack().getStart()).getPosition().equals(PointPosition.Inside)
+                    || Calc.intersectSegments(edgeEnd, click, getTrack().getStart()).getPosition().equals(PointPosition.Inside)) {
                 intersect = true;
             } else if (getTrack().getFinish() != null) {
-                if ((int) Calc.crossing(edgeStart, click, getTrack().getFinish())[0] == Calc.INSIDE
-                        || (int) Calc.crossing(edgeEnd, click, getTrack().getFinish())[0] == Calc.INSIDE) {
+                if (Calc.intersectSegments(edgeStart, click, getTrack().getFinish()).getPosition().equals(PointPosition.Inside)
+                        || Calc.intersectSegments(edgeEnd, click, getTrack().getFinish()).getPosition().equals(PointPosition.Inside)) {
                     intersect = true;
                 }
             }

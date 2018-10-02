@@ -5,19 +5,16 @@ import java.util.List;
 
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
+import com.ambroz.formula.gamemodel.enums.PointPosition;
 import com.ambroz.formula.gamemodel.race.Turn;
 import com.ambroz.formula.gamemodel.track.Track;
 
 /**
- * This is a class with different matematical operations and methods which are static.
+ * This is a class with different mathematical operations and methods which are static.
  *
  * @author Jiri Ambroz
  */
 public abstract class Calc {
-
-    public static final int OUTSIDE = -1;
-    public static final int EDGE = 0;
-    public static final int INSIDE = 1;
 
     /**
      * This method finds out if two segments have intersect. Each segment is defined by Segment object. It doesn't
@@ -28,24 +25,26 @@ public abstract class Calc {
      * @return ArrayList of length 2. First value is Integer which means if there is intersect (1 for intersect, 0 for
      * touch and -1 for no intersect. Second value in List is Point where is the intersect.
      */
-    public static Object[] crossing(Segment segment1, Segment segment2) {
-        int intersect = OUTSIDE;
-        Point colPoint = calculateIntersect(segment1, segment2.getFirst(), segment2.getLast());
+    public static Point intersectSegments(Segment segment1, Segment segment2) {
+        Point colPoint = calculateIntersection(segment1.getFirst(), segment1.getLast(), segment2.getFirst(), segment2.getLast());
 
-        if (colPoint != null) {
-            if (pointPosition(segment1, colPoint) == INSIDE && pointPosition(segment2, colPoint) == INSIDE) {
+        if (!colPoint.isEmpty()) {
+            if (pointPosition(segment1, colPoint).equals(PointPosition.Inside) && pointPosition(segment2, colPoint).equals(PointPosition.Inside)) {
                 //usecky se protinaji uvnitr
-                intersect = INSIDE;
-            } else if (pointPosition(segment1, colPoint) == EDGE && pointPosition(segment2, colPoint) == EDGE) {
+                colPoint.setPosition(PointPosition.Inside);
+            } else if (pointPosition(segment1, colPoint).equals(PointPosition.Edge) && pointPosition(segment2, colPoint).equals(PointPosition.Edge)) {
                 //usecky se spolecne dotykaji v jednom konci
-                intersect = EDGE;
-            } else if ((pointPosition(segment1, colPoint) == EDGE && pointPosition(segment2, colPoint) == INSIDE)
-                    || (pointPosition(segment2, colPoint) == EDGE && pointPosition(segment1, colPoint) == INSIDE)) {
+                colPoint.setPosition(PointPosition.Edge);
+            } else if ((pointPosition(segment1, colPoint).equals(PointPosition.Edge) && pointPosition(segment2, colPoint).equals(PointPosition.Inside))
+                    || (pointPosition(segment2, colPoint).equals(PointPosition.Edge) && pointPosition(segment1, colPoint).equals(PointPosition.Inside))) {
                 //konec jedne usecky se dotyka vnitrku druhe usecky
-                intersect = EDGE;
+                colPoint.setPosition(PointPosition.Edge);
+            } else {
+                colPoint.setPosition(PointPosition.Outside);
             }
         }
-        return new Object[]{intersect, colPoint};
+
+        return colPoint;
     }
 
     /**
@@ -58,8 +57,8 @@ public abstract class Calc {
      * @return ArrayList of length 2. First value is Integer which means if there is intersect (1 for intersect, 0 for
      * touch and -1 for no intersect. Second value in List is Point where is the intersect.
      */
-    public static Object[] crossing(Point a, Point b, Segment segment) {
-        return crossing(new Segment(a, b), segment);
+    public static Point intersectSegments(Point a, Point b, Segment segment) {
+        return intersectSegments(new Segment(a, b), segment);
     }
 
     /**
@@ -73,39 +72,45 @@ public abstract class Calc {
      * @return ArrayList of length 2. First value is Integer which means if there is intersect (1 for intersect, 0 for
      * touch and -1 for no intersect. Second value in List is Point where is the intersect.
      */
-    public static Object[] crossing(Point a, Point b, Point c, Point d) {
-        return crossing(a, b, new Segment(c, d));
+    public static Point intersectSegments(Point a, Point b, Point c, Point d) {
+        return intersectSegments(a, b, new Segment(c, d));
     }
 
     public static Point halfLineAndSegmentIntersection(Segment segment, Point lineStart, Point lineEnd) {
-        Point colPoint = calculateIntersect(segment, lineStart, lineEnd);
+        Point colPoint = calculateIntersection(segment.getFirst(), segment.getLast(), lineStart, lineEnd);
 
-        if (colPoint != null) {
-            int intersectPosition = pointPosition(segment, colPoint);
-            if (intersectPosition == OUTSIDE || intersectPosition != OUTSIDE && isPointBehind(lineStart, lineEnd, colPoint)) {
+        if (!colPoint.isEmpty()) {
+            PointPosition intersectPosition = pointPosition(segment, colPoint);
+            if (intersectPosition.equals(PointPosition.Outside) || !intersectPosition.equals(PointPosition.Outside) && isPointBehind(lineStart, lineEnd, colPoint)) {
                 //line intersects the segment
-                colPoint = null;
+                colPoint = new Point();
             }
         }
 
         return colPoint;
     }
 
+    /**
+     * NOT USED.
+     *
+     * @param segment
+     * @param lineStart
+     * @param lineEnd
+     * @return
+     */
     public static Point calculateCollisionPoint(Segment segment, Point lineStart, Point lineEnd) {
-        Point collision = calculateIntersect(segment, lineStart, lineEnd);
+        Point collision = calculateIntersection(segment.getFirst(), segment.getLast(), lineStart, lineEnd);
 
-        if (collision != null && pointPosition(segment, collision) != INSIDE) {
+        if (!collision.isEmpty() && !pointPosition(segment, collision).equals(PointPosition.Inside)) {
             //line intersects the segment
-            collision = null;
+            collision = new Point();
         }
 
         return collision;
     }
 
-    private static Point calculateIntersect(Segment segment, Point c, Point d) {
-        Point colPoint = null;
-        Point a = segment.getFirst();
-        Point b = segment.getLast();
+    private static Point calculateIntersection(Point a, Point b, Point c, Point d) {
+        Point colPoint;
 
         //t vychazi z parametrickeho vyjadreni primky
         double t = (a.x * d.y - a.x * c.y - c.x * d.y - d.x * a.y + d.x * c.y + c.x * a.y)
@@ -117,32 +122,36 @@ public abstract class Calc {
             double intersectY = a.y + (b.y - a.y) * t;
             //cannot be rounded!!!
             colPoint = new Point(intersectX, intersectY);
+        } else {
+            colPoint = new Point();
+            colPoint.setPosition(PointPosition.Outside);
         }
 
         return colPoint;
     }
 
     /**
-     * Metoda urcuje pozici bodu inter vuci usecce AB
+     * Method determines point position against segment AB.
      *
      * @param segment is segment where the point will be compared
-     * @param inter
-     * @return - hodnoty: 1 pro polohu uvnitr usecky, 0 pro polohu na kraji a -1 kdyz lezi mimo usecku
+     * @param point
+     * @return "inside" if point belongs to segment, "outside" if it is outside segment and "insideoutsideLine" if the
+     * point is identical with one of the segment vertex.
      */
-    public static int pointPosition(Segment segment, Point inter) {
+    private static PointPosition pointPosition(Segment segment, Point point) {
         Point a = segment.getFirst();
         Point b = segment.getLast();
 
-        double ix = inter.x;
-        double iy = inter.y;
+        double ix = point.x;
+        double iy = point.y;
 
-        if (inter.isEqual(a) || inter.isEqual(b)) {
-            return EDGE;
+        if (point.isEqual(a) || point.isEqual(b)) {
+            return PointPosition.Edge;
         } else if ((ix >= a.x && ix <= b.x || ix <= a.x && ix >= b.x)
                 && (iy >= a.y && iy <= b.y || iy <= a.y && iy >= b.y)) {
-            return INSIDE;
+            return PointPosition.Inside;
         } else {
-            return OUTSIDE;
+            return PointPosition.Outside;
         }
     }
 

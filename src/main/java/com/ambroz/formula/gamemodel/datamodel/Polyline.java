@@ -1,5 +1,6 @@
 package com.ambroz.formula.gamemodel.datamodel;
 
+import com.ambroz.formula.gamemodel.enums.PointPosition;
 import com.ambroz.formula.gamemodel.utils.Calc;
 
 /**
@@ -56,7 +57,7 @@ public class Polyline extends Segment {
 
     /**
      * This method overwrite point on position <code>pos</code> in this polyline with new <code>point p</code>. Point
-     * whis is on position <code>pos</code> will be delete.
+     * which is on position <code>pos</code> will be delete.
      *
      * @param p is new point which we want to add to
      * @param pos is position where the point will be insert
@@ -155,16 +156,15 @@ public class Polyline extends Segment {
      * rest of segment in line.
      *
      * @param click point where the track will be constructed
-     * @return true if there is a colision
+     * @return true if there is a collision
      */
     public boolean checkOwnCrossing(Point click) {
         boolean crossed = false;
         if (getLength() > 1) {
             Point last = getLast();
-            //prochazeni usecek leve krajnice od prvni do posledni usecky
+
             for (int i = 0; i < getLength() - 2; i++) {
-                //kontrola mozne kolize usecek:
-                if ((int) Calc.crossing(last, click, getSegment(i))[0] != Calc.OUTSIDE) {
+                if (!Calc.intersectSegments(last, click, getSegment(i)).getPosition().equals(PointPosition.Outside)) {
                     crossed = true;
                     break;
                 }
@@ -179,14 +179,13 @@ public class Polyline extends Segment {
      *
      * @param last last point of line which is constructed
      * @param click point where the track will be constructed
-     * @return true if there is a colision
+     * @return true if there is a collision
      */
     public boolean checkSegmentCrossing(Point last, Point click) {
         if (getLength() > 1) {
-            //prochazeni usecek leve krajnice od prvni do posledni usecky
+
             for (int i = 0; i < getLength() - 1; i++) {
-                //kontrola mozne kolize usecek:
-                if ((int) Calc.crossing(last, click, getSegment(i))[0] != Calc.OUTSIDE) {
+                if (!Calc.intersectSegments(last, click, getSegment(i)).getPosition().equals(PointPosition.Outside)) {
                     return true;
                 }
             }

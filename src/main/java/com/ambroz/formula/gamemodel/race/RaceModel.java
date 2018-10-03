@@ -27,8 +27,6 @@ public class RaceModel extends CoreModel {
     }
 
     public void moveWithPlayer(Point click) {
-        click.toGridUnits(getPaper().getGridSize());
-
         if (!getPaper().isOutside(click)) {
             fireHint(HintLabels.EMPTY);
 

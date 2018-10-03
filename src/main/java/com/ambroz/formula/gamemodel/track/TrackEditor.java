@@ -31,7 +31,6 @@ public class TrackEditor extends CoreModel {
     public boolean memorizeTrackPoint(Point click) {
         boolean onTrack = false;
         if (getStage() == TrackBuilder.EDIT_PRESS) {
-            click.toGridUnits(getPaper().getGridSize());
 
             onTrack = clickOnTrack(click);
             if (!onTrack) {
@@ -82,7 +81,6 @@ public class TrackEditor extends CoreModel {
      */
     public void replaceTrackPoint(Point click) {
         if (getStage() == TrackBuilder.EDIT_RELEASE) {
-            click.toGridUnits(getPaper().getGridSize());
 
             setStage(TrackBuilder.EDIT_PRESS);
             if (!isNewPointValid(click)) {

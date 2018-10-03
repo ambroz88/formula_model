@@ -76,6 +76,14 @@ public abstract class Calc {
         return intersectSegments(a, b, new Segment(c, d));
     }
 
+    /**
+     * NOT USED
+     *
+     * @param segment
+     * @param lineStart
+     * @param lineEnd
+     * @return
+     */
     public static Point halfLineAndSegmentIntersection(Segment segment, Point lineStart, Point lineEnd) {
         Point colPoint = calculateIntersection(segment.getFirst(), segment.getLast(), lineStart, lineEnd);
 
@@ -187,12 +195,7 @@ public abstract class Calc {
      * @return the nearest point in the list
      */
     public static Point findNearestPoint(Point sourcePoint, List<Point> data) {
-        int minIndex = 0;
-        for (int i = 1; i < data.size(); i++) {
-            if (distance(sourcePoint, data.get(minIndex)) > distance(sourcePoint, data.get(i))) {
-                minIndex = i;
-            }
-        }
+        int minIndex = findNearestIndex(sourcePoint, data);
         return data.get(minIndex);
     }
 
@@ -233,16 +236,16 @@ public abstract class Calc {
     }
 
     /**
-     * This method create point in the angle axis which is given by tree points. It is possible to say on which side
-     * that point should be create.
+     * This method calculates angle which is given by tree points. It is possible to say on which side this angle should
+     * be taken.
      *
      * @param prev is first point
      * @param mid is second point
      * @param next is third point
-     * @param side is side from polyline where new point should be created (Side.Left or Side.Right)
-     * @return point in the angle axis on given side from polyline
+     * @param side is side from polyline where angle will be calculated (Side.Left or Side.Right)
+     * @return angle between tree points
      */
-    public static Point calculateAngle(Point prev, Point mid, Point next, Side side) {
+    public static double calculateAngle(Point prev, Point mid, Point next, Side side) {
         double a = distance(mid, next);
         double b = distance(prev, mid);
         double c = distance(prev, next);
@@ -259,17 +262,17 @@ public abstract class Calc {
         if (side == Side.Right) {
             gamma = -gamma;
         }
-        return rotatePoint(prev, mid, gamma / 2, 10);
+        return gamma;
     }
 
     /**
      * This method rotates one point around another point. Parameters of this rotation are: angle and new distance from
-     * center of rotation.
+     * centre of rotation.
      *
      * @param rotated is point which is rotated
      * @param center is central point of rotation
      * @param angle is rotation angle in radians
-     * @param newLength is new distance between center and rotated point
+     * @param newLength is new distance between centre and rotated point
      * @return point with new coordinates
      */
     public static Point rotatePoint(Point rotated, Point center, double angle, double newLength) {
@@ -279,6 +282,29 @@ public abstract class Calc {
         double endX = (tempX - center.x) * Math.cos(angle) - (tempY - center.y) * Math.sin(angle);
         double endY = (tempX - center.x) * Math.sin(angle) + (tempY - center.y) * Math.cos(angle);
         return new Point((int) (center.x + endX), (int) (center.y + endY));
+    }
+
+    /**
+     * Method finds out on which side is a enter point in relation with given segment. If the point lies on the segment,
+     * position is declare as on the right side.
+     *
+     * @param center is investigated point
+     * @param segment is investigated segment
+     * @return Side.Left if point is on the left or Side.Right if it is on the right side
+     */
+    public static Side sidePosition(Point center, Segment segment) {
+        double ux = segment.getLast().x - segment.getFirst().x;
+        double uy = segment.getLast().y - segment.getFirst().y;
+        double vx = center.x - segment.getFirst().x;
+        double vy = center.y - segment.getFirst().y;
+
+        // skalarni soucin dvou vektoru
+        double t = ux * vy - uy * vx;
+        if (t >= 0) {
+            return Side.Right;
+        } else {
+            return Side.Left;
+        }
     }
 
     /**
@@ -379,27 +405,6 @@ public abstract class Calc {
         double X = (start.x + nx * t);
         double Y = (start.y + ny * t);
         return new Point((int) X, (int) Y);
-    }
-
-    /**
-     * Metoda zjisti, na jake strane lezi bod center od kolizni usecky. Poloha na usecce je zahrnuta do polohy vpravo.
-     *
-     * @param center vstupni porovnavany bod
-     * @param colLine kolizni usecka, od ktere se uvazuje poloha bodu
-     * @return 1 if point si on the left or 2 if it is on the right
-     */
-    public static Side sidePosition(Point center, Segment colLine) {
-        double ux = colLine.getLast().x - colLine.getFirst().x;
-        double uy = colLine.getLast().y - colLine.getFirst().y;
-        double vx = center.x - colLine.getFirst().x;
-        double vy = center.y - colLine.getFirst().y;
-
-        double t = ux * vy - uy * vx; // skalarni soucin dvou vektoru
-        if (t >= 0) {
-            return Side.Right;
-        } else {
-            return Side.Left;
-        }
     }
 
 }

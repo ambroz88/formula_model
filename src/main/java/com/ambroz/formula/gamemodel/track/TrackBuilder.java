@@ -10,6 +10,7 @@ import com.ambroz.formula.gamemodel.enums.PointPosition;
 import com.ambroz.formula.gamemodel.enums.Side;
 import com.ambroz.formula.gamemodel.labels.HintLabels;
 import com.ambroz.formula.gamemodel.utils.Calc;
+import static com.ambroz.formula.gamemodel.utils.Calc.rotatePoint;
 import com.ambroz.formula.gamemodel.utils.TrackIO;
 import com.ambroz.formula.gamemodel.utils.TrackUtils;
 
@@ -53,7 +54,6 @@ public class TrackBuilder extends TrackEditor {
      */
     public void buildTrack(Point click) {
         if (getStage() < TrackBuilder.EDIT_PRESS) {
-            click.toGridUnits(getPaper().getGridSize());
 
             configureTrackSides();
 
@@ -211,6 +211,7 @@ public class TrackBuilder extends TrackEditor {
         Point center;
         Point next;
         Point sidePoint;
+        double angle;
         int index = getTrack().getIndex(oppSide);
 
         while (search) {
@@ -230,7 +231,8 @@ public class TrackBuilder extends TrackEditor {
                     next = oppositeLine.getPoint(index + 1);
                 }
 
-                sidePoint = Calc.calculateAngle(prev, center, next, activeSide);
+                angle = Calc.calculateAngle(prev, center, next, activeSide);
+                sidePoint = rotatePoint(prev, center, angle / 2, 10);
 
                 if (Calc.intersectSegments(activeLine.getLast(), click, center, sidePoint).getPosition().contains(PointPosition.Inside)) {
                     //point click went through "control segment"

@@ -5,6 +5,7 @@ import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.enums.PointPosition;
+import com.ambroz.formula.gamemodel.enums.Side;
 import com.ambroz.formula.gamemodel.labels.HintLabels;
 import com.ambroz.formula.gamemodel.utils.Calc;
 
@@ -15,7 +16,7 @@ import com.ambroz.formula.gamemodel.utils.Calc;
 public class TrackEditor extends CoreModel {
 
     private int movePointIndex;
-    private int side;
+    private Side side;
 
     public TrackEditor(Paper paper) {
         super(paper);
@@ -56,7 +57,7 @@ public class TrackEditor extends CoreModel {
         for (int i = 1; i < getTrack().getLeft().getLength() - 1; i++) {
             if (click.isEqual(getTrack().getLeft().getPoint(i))) {
                 movePointIndex = i;
-                side = Track.LEFT;
+                side = Side.Left;
                 break;
             }
         }
@@ -65,7 +66,7 @@ public class TrackEditor extends CoreModel {
             for (int i = 1; i < getTrack().getRight().getLength() - 1; i++) {
                 if (click.isEqual(getTrack().getRight().getPoint(i))) {
                     movePointIndex = i;
-                    side = Track.RIGHT;
+                    side = Side.Right;
                     break;
                 }
             }
@@ -104,8 +105,8 @@ public class TrackEditor extends CoreModel {
 
         // new segments can't cross start, finish or opposite side
         boolean intersect = crossEndLines(newEdgeStart, newEdgeEnd, click)
-                || getTrack().getOppLine(side).checkSegmentCrossing(newEdgeStart, click)
-                || getTrack().getOppLine(side).checkSegmentCrossing(newEdgeEnd, click);
+                || getTrack().getLine(side.getOppositeSide()).checkSegmentCrossing(newEdgeStart, click)
+                || getTrack().getLine(side.getOppositeSide()).checkSegmentCrossing(newEdgeEnd, click);
 
         if (!intersect) {
 

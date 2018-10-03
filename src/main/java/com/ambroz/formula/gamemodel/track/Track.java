@@ -2,9 +2,10 @@ package com.ambroz.formula.gamemodel.track;
 
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
-import com.ambroz.formula.gamemodel.datamodel.Segment;
-import com.ambroz.formula.gamemodel.utils.Calc;
 import com.ambroz.formula.gamemodel.datamodel.PropertyChanger;
+import com.ambroz.formula.gamemodel.datamodel.Segment;
+import com.ambroz.formula.gamemodel.enums.Side;
+import com.ambroz.formula.gamemodel.utils.Calc;
 
 /**
  * This class represents track of the race. It is composed from two polylines (left and right) and next two polylines
@@ -15,10 +16,15 @@ import com.ambroz.formula.gamemodel.datamodel.PropertyChanger;
  */
 public class Track extends PropertyChanger {
 
-    public static int LEFT = 1, RIGHT = -1, LIMIT_DIST = 15, LIMIT_NEXT = 5;
+    public static int LIMIT_DIST = 15;
+    public static int LIMIT_NEXT = 5;
+
     private Polyline left;
     private Polyline right;
-    private int leftIndex, rightIndex, leftWidth, rightWidth;
+    private int leftIndex;
+    private int rightIndex;
+    private int leftWidth;
+    private int rightWidth;
     private int maxWidth;
     private int maxHeight;
     private boolean ready;
@@ -35,42 +41,43 @@ public class Track extends PropertyChanger {
         ready = false;
     }
 
-    public Polyline getLine(int side) {
-        if (side == LEFT) {
+    public Polyline getLine(Side side) {
+        if (side == Side.Left) {
             return getLeft();
         } else {
             return getRight();
         }
     }
 
-    public Polyline getOppLine(int side) {
-        if (side == LEFT) {
-            return getRight();
-        } else {
-            return getLeft();
-        }
-    }
-
-    public void addPoint(int side, Point point) {
+    public void addPoint(Side side, Point point) {
         getLine(side).addPoint(point);
         calculateReady();
         checkMaximum(point);
     }
 
-    public void removeLastPoint(int side) {
+    public void removeLastPoint(Side side) {
         getLine(side).removeLast();
         if (getIndex(side) > 0 && getIndex(side) >= getLine(side).getLength()) {
             setIndex(getIndex(side) - 1, side);
-            if (side == LEFT) {
-                if (getIndex(RIGHT) > getIndex(side)) {
-                    setIndex(getIndex(RIGHT) - 1, RIGHT);
+            if (side == Side.Left) {
+                if (getIndex(Side.Right) > getIndex(side)) {
+                    setIndex(getIndex(Side.Right) - 1, Side.Right);
                 }
-            } else if (getIndex(LEFT) > getIndex(side)) {
-                setIndex(getIndex(LEFT) - 1, LEFT);
+            } else if (getIndex(Side.Left) > getIndex(side)) {
+                setIndex(getIndex(Side.Left) - 1, Side.Left);
             }
         }
         calculateReady();
         calculateDimension();
+    }
+
+    private void calculateDimension() {
+        for (int i = 0; i < getLong().getLength(); i++) {
+            checkMaximum(getLong().getPoint(i));
+            if (i < getShort().getLength()) {
+                checkMaximum(getShort().getPoint(i));
+            }
+        }
     }
 
     /**
@@ -95,12 +102,16 @@ public class Track extends PropertyChanger {
         return index;
     }
 
-    public void calculateDimension() {
-        for (int i = 0; i < getLong().getLength(); i++) {
-            checkMaximum(getLong().getPoint(i));
-            if (i < getShort().getLength()) {
-                checkMaximum(getShort().getPoint(i));
-            }
+    /**
+     * This method returns Side which is now shorter.
+     *
+     * @return enum Side.Left or Side.Right
+     */
+    private Side getShortStr() {
+        if (getLeft().getLength() < getRight().getLength()) {
+            return Side.Left;
+        } else {
+            return Side.Right;
         }
     }
 
@@ -136,33 +147,6 @@ public class Track extends PropertyChanger {
             return getLeft();
         } else {
             return getRight();
-        }
-    }
-
-    /**
-     * This method selects longer side of the track when it is prepare for race
-     *
-     * @return String of longer polyline (if it is LEFT or RIGHT side)
-     */
-    public int getLongStr() {
-        //vrati delsi stranu trati jako text (left, right)
-        if (getLeft().getLength() >= getRight().getLength()) {
-            return LEFT;
-        } else {
-            return RIGHT;
-        }
-    }
-
-    /**
-     * This method selects shorter side of the track when it is prepare for race
-     *
-     * @return String of shorter polyline (if it is LEFT or RIGHT side)
-     */
-    public int getShortStr() {
-        if (getLeft().getLength() < getRight().getLength()) {
-            return LEFT;
-        } else {
-            return RIGHT;
         }
     }
 
@@ -208,11 +192,11 @@ public class Track extends PropertyChanger {
      * This method returns actual index of well placed point to the track. You have to specify in which side you are
      * interested.
      *
-     * @param side is String of side where you want to find index (right or left)
+     * @param side is enum Side that represents side where you want to find index (right or left)
      * @return left or right index
      */
-    public int getIndex(int side) {
-        if (side == LEFT) {
+    public int getIndex(Side side) {
+        if (side == Side.Left) {
             return leftIndex;
         } else {
             return rightIndex;
@@ -223,18 +207,18 @@ public class Track extends PropertyChanger {
      * This method sets actual index on specific side.
      *
      * @param index is position of new index
-     * @param side means which side you want to set up
+     * @param side means which enum Side, which you want to set up
      */
-    public void setIndex(int index, int side) {
-        if (side == LEFT) {
+    public void setIndex(int index, Side side) {
+        if (side == Side.Left) {
             leftIndex = index;
         } else {
             rightIndex = index;
         }
     }
 
-    public void setWidth(int side) {
-        if (side == LEFT) {
+    public void setWidth(Side side) {
+        if (side == Side.Left) {
             leftWidth = 4;
             rightWidth = 3;
         } else {
@@ -243,20 +227,12 @@ public class Track extends PropertyChanger {
         }
     }
 
-    public int getLeftWidth() {
-        return leftWidth;
-    }
-
-    public void setLeftWidth(int leftWidth) {
-        this.leftWidth = leftWidth;
-    }
-
-    public int getRightWidth() {
-        return rightWidth;
-    }
-
-    public void setRightWidth(int rightWidth) {
-        this.rightWidth = rightWidth;
+    public int getWidth(Side side) {
+        if (side == Side.Left) {
+            return leftWidth;
+        } else {
+            return rightWidth;
+        }
     }
 
     //TODO: dokoncit drahu jak se slusi a patri
@@ -365,10 +341,12 @@ public class Track extends PropertyChanger {
         int rightSize = getRight().getLength();
         int[] xPoints = new int[leftSize + rightSize];
         int[] yPoints = new int[leftSize + rightSize];
+
         for (int i = 0; i < leftSize; i++) {
             xPoints[i] = getLeft().getPoint(i).getX() * gridSize;
             yPoints[i] = getLeft().getPoint(i).getY() * gridSize;
         }
+
         for (int i = 0; i < rightSize; i++) {
             //right side has to be saved from the end to the start
             int opIndex = rightSize - 1 - i;
@@ -378,7 +356,7 @@ public class Track extends PropertyChanger {
         return new int[][]{xPoints, yPoints};
     }
 
-    public boolean freeDrawing(int side, int oppSide) {
+    public boolean freeDrawing(Side side, Side oppSide) {
         return getLine(side).getLength() > getIndex(side) && getIndex(oppSide) >= getLine(oppSide).getLength() - 2;
     }
 
@@ -390,6 +368,7 @@ public class Track extends PropertyChanger {
         Polyline tempLeft = new Polyline(getLeft());
         getLeft().clear();
         getRight().clear();
+
         left = tempRight.reverse();
         right = tempLeft.reverse();
         leftIndex = getLeft().getLength() - 1;
@@ -403,18 +382,6 @@ public class Track extends PropertyChanger {
         rightIndex = 0;
         maxWidth = 0;
         maxHeight = 0;
-    }
-
-    public void setTrack(Track track) {
-        reset();
-        setLeft(track.getLine(Track.LEFT));
-        setRight(track.getLine(Track.RIGHT));
-        setReady(true);
-        calculateDimension();
-    }
-
-    public Track getTrack() {
-        return this;
     }
 
     @Override

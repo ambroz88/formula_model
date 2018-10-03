@@ -2,12 +2,13 @@ package com.ambroz.formula.gamemodel.utils;
 
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
+import com.ambroz.formula.gamemodel.enums.Side;
 
 /**
  *
- * @author Jiri Ambroz
+ * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
-public class TrackUtils {
+public abstract class TrackUtils {
 
     public static final int NORTH = 1;
     public static final int NORTH_EAST = 2;
@@ -19,8 +20,8 @@ public class TrackUtils {
     public static final int NORTH_WEST = 8;
 
     /**
-     * <html>This method calculetes the code of direction kvadrant of segment which is given by two
-     * points. It depends on order of the segment. Possible directions:<br>
+     * <html>This method calculetes the code of direction kvadrant of segment which is given by two points. It depends
+     * on order of the segment. Possible directions:<br>
      * 1 = north 3 = east 5 = south 7 = west <br>
      * 2 = northeast 4 = southeast 6 = southwest 8 = northwest
      *
@@ -54,61 +55,61 @@ public class TrackUtils {
     }
 
     /**
-     * It calculates 5 points which lies horizontaly and verticaly from central point. Direction is
-     * based on octant which says if segment went to "north east", "south west" or "south" etc.
+     * It calculates 5 points which lies horizontaly and verticaly from central point. Direction is based on octant
+     * which says if segment went to "north east", "south west" or "south" etc.
      *
      * @param octant determines direction of the segment
      * @param centralPoint is point from which the calculations start
-     * @param side means which side is build (Track.LEFT or Track.RIGHT)
+     * @param side means which side is build (Side.Left or Side.Right)
      * @return points as a polyline
      */
-    public static Polyline generateGoalPoints(int octant, Point centralPoint, int side) {
-
+    public static Polyline generateGoalPoints(int octant, Point centralPoint, Side side) {
+        int intSide = side.getValue();
         // NALEZENI KVADRANTU, KAM SMERUJE ZVOLENA USECKA
         Polyline points = new Polyline();
         switch (octant) {
             case NORTH:
                 for (int i = 3; i < 8; i++) {
-                    points.addPoint(new Point(centralPoint.x - side * i, centralPoint.y));
+                    points.addPoint(new Point(centralPoint.x - intSide * i, centralPoint.y));
                 }
                 break;
             case NORTH_EAST:
                 for (int i = 3; i < 8; i++) {
-                    points.addPoint(new Point(centralPoint.x - side * i, centralPoint.y));
-                    points.addPoint(new Point(centralPoint.x, centralPoint.y - side * i));
+                    points.addPoint(new Point(centralPoint.x - intSide * i, centralPoint.y));
+                    points.addPoint(new Point(centralPoint.x, centralPoint.y - intSide * i));
                 }
                 break;
             case EAST:
                 for (int i = 3; i < 8; i++) {
-                    points.addPoint(new Point(centralPoint.x, centralPoint.y - side * i));
+                    points.addPoint(new Point(centralPoint.x, centralPoint.y - intSide * i));
                 }
                 break;
             case SOUTH_EAST:
                 for (int i = 3; i < 8; i++) {
-                    points.addPoint(new Point(centralPoint.x + side * i, centralPoint.y));
-                    points.addPoint(new Point(centralPoint.x, centralPoint.y - side * i));
+                    points.addPoint(new Point(centralPoint.x + intSide * i, centralPoint.y));
+                    points.addPoint(new Point(centralPoint.x, centralPoint.y - intSide * i));
                 }
                 break;
             case SOUTH:
                 for (int i = 3; i < 8; i++) {
-                    points.addPoint(new Point(centralPoint.x + side * i, centralPoint.y));
+                    points.addPoint(new Point(centralPoint.x + intSide * i, centralPoint.y));
                 }
                 break;
             case SOUTH_WEST:
                 for (int i = 3; i < 8; i++) {
-                    points.addPoint(new Point(centralPoint.x + side * i, centralPoint.y));
-                    points.addPoint(new Point(centralPoint.x, centralPoint.y + side * i));
+                    points.addPoint(new Point(centralPoint.x + intSide * i, centralPoint.y));
+                    points.addPoint(new Point(centralPoint.x, centralPoint.y + intSide * i));
                 }
                 break;
             case WEST:
                 for (int i = 3; i < 8; i++) {
-                    points.addPoint(new Point(centralPoint.x, centralPoint.y + side * i));
+                    points.addPoint(new Point(centralPoint.x, centralPoint.y + intSide * i));
                 }
                 break;
             case NORTH_WEST:
                 for (int i = 3; i < 8; i++) {
-                    points.addPoint(new Point(centralPoint.x - side * i, centralPoint.y));
-                    points.addPoint(new Point(centralPoint.x, centralPoint.y + side * i));
+                    points.addPoint(new Point(centralPoint.x - intSide * i, centralPoint.y));
+                    points.addPoint(new Point(centralPoint.x, centralPoint.y + intSide * i));
                 }
                 break;
         }

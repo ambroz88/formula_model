@@ -5,7 +5,7 @@ import java.util.List;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.enums.PointPosition;
-import com.ambroz.formula.gamemodel.track.Track;
+import com.ambroz.formula.gamemodel.enums.Side;
 import com.ambroz.formula.gamemodel.utils.Calc;
 
 /**
@@ -68,7 +68,7 @@ public final class TurnCalculations {
             if (lastPoint.getPosition().equals(PointPosition.CollisionLeft)) {
 
                 //novy stred musi byt vpravo od kolizni usecky
-                if (Track.RIGHT == Calc.sidePosition(inter1, collisionLine)) {
+                if (Side.Right == Calc.sidePosition(inter1, collisionLine)) {
                     crashCenter = new Point(inter1.getX(), inter1.getY());
                 } else {
                     crashCenter = new Point(inter2.getX(), inter2.getY());
@@ -77,7 +77,7 @@ public final class TurnCalculations {
             } else if (lastPoint.getPosition().equals(PointPosition.CollisionRight)) {
 
                 //novy stred musi byt vlevo od kolizni usecky
-                if (Track.LEFT == Calc.sidePosition(inter1, collisionLine)) {
+                if (Side.Left == Calc.sidePosition(inter1, collisionLine)) {
                     crashCenter = new Point(inter1.getX(), inter1.getY());
                 } else {
                     crashCenter = new Point(inter2.getX(), inter2.getY());

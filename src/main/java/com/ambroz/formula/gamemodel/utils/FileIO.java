@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils;
 
 /**
  *
- * @author Jiri Ambroz
+ * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
 public abstract class FileIO {
 

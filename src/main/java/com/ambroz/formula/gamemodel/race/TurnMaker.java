@@ -1,6 +1,5 @@
 package com.ambroz.formula.gamemodel.race;
 
-import java.awt.Color;
 import java.util.HashMap;
 
 import com.ambroz.formula.gamemodel.datamodel.Collision;
@@ -9,6 +8,7 @@ import com.ambroz.formula.gamemodel.datamodel.Polyline;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.enums.FormulaType;
 import com.ambroz.formula.gamemodel.enums.PointPosition;
+import com.ambroz.formula.gamemodel.enums.Side;
 import com.ambroz.formula.gamemodel.track.Track;
 import com.ambroz.formula.gamemodel.utils.Calc;
 
@@ -33,7 +33,7 @@ public class TurnMaker {
         formulaID = 1;
         racers = new HashMap<>();
         racers.put(formulaID, new Formula(FormulaType.Player));
-        getFormula(formulaID).setColor(Color.BLUE.getRGB());
+
         turns = new Turns();
         turnsCount = 4;
     }
@@ -72,7 +72,7 @@ public class TurnMaker {
 
     private void checkFinishTurn(Turn selectedTurn, Point click) {
         if (selectedTurn.getPosition().contains(PointPosition.Finish)
-                && Track.LEFT == Calc.sidePosition(click, model.getTrack().getFinish())) {
+                && Side.Left == Calc.sidePosition(click, model.getTrack().getFinish())) {
             Formula act = getFormula(formulaID);
             act.lengthUp(act.getPreLast(), selectedTurn.getCollision().getCollisionPoint());
             act.setWin(true);
@@ -187,7 +187,7 @@ public class TurnMaker {
         Segment startLine = model.getTrack().getStart();
 
         Point start = Calc.intersectSegments(lastFormulaMove, startLine);
-        if (!start.getPosition().equals(PointPosition.Outside) && Track.RIGHT == Calc.sidePosition(lastFormulaMove.getFirst(), startLine)) {
+        if (!start.getPosition().equals(PointPosition.Outside) && Side.Right == Calc.sidePosition(lastFormulaMove.getFirst(), startLine)) {
             //tah protina start a konci vpravo od nej (projel se v protismeru)
             start.setPosition(PointPosition.CollisionRight);
             selectedTurn.setCollision(new Collision(start, startLine));

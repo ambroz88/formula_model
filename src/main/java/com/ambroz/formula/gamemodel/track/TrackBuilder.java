@@ -7,6 +7,7 @@ import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.enums.PointPosition;
+import com.ambroz.formula.gamemodel.enums.Side;
 import com.ambroz.formula.gamemodel.labels.HintLabels;
 import com.ambroz.formula.gamemodel.utils.Calc;
 import com.ambroz.formula.gamemodel.utils.TrackIO;
@@ -26,8 +27,7 @@ public class TrackBuilder extends TrackEditor {
     public static final int EDIT_PRESS = 3;
     public static final int EDIT_RELEASE = 4;
 
-    private int side;
-    private int oppSide;
+    private Side activeSide;
 
     private Polyline points;
     private String message;
@@ -36,7 +36,7 @@ public class TrackBuilder extends TrackEditor {
         super(paper);
         points = new Polyline();
         setupPaper();
-        side = Track.LEFT;
+        activeSide = Side.Left;
         setStage(BUILD_LEFT);
     }
 
@@ -57,19 +57,19 @@ public class TrackBuilder extends TrackEditor {
 
             configureTrackSides();
 
-            Polyline actLine = getTrack().getLine(side);
-            Polyline oppositeLine = getTrack().getLine(oppSide);
+            Polyline activeLine = getTrack().getLine(activeSide);
+            Polyline oppositeLine = getTrack().getLine(activeSide.getOppositeSide());
             message = HintLabels.EMPTY;
 
             if (!oppositeLine.isEmpty()) {
                 //OPPOSITE LINE WAS ALLREADY STARTED
-                if (actLine.isEmpty()) {
+                if (activeLine.isEmpty()) {
                     determineStartLine(click);
-                } else if (actLine.getLast().isEqual(click) == false && validateSecondLine(click)) {
+                } else if (activeLine.getLast().isEqual(click) == false && validateSecondLine(click)) {
                     addPointToTrack(click);
                 }
             } else {
-                validateJustActiveLine(actLine, click);
+                validateJustActiveLine(activeLine, click);
             }
 
             fireHint(getMessage());
@@ -79,11 +79,9 @@ public class TrackBuilder extends TrackEditor {
 
     private void configureTrackSides() {
         if (getStage() == BUILD_LEFT) {
-            side = Track.LEFT;
-            oppSide = Track.RIGHT;
+            activeSide = Side.Left;
         } else {
-            side = Track.RIGHT;
-            oppSide = Track.LEFT;
+            activeSide = Side.Right;
         }
     }
 
@@ -96,7 +94,7 @@ public class TrackBuilder extends TrackEditor {
         if (getPoints().contains(click)) {
             generateFinishTurns();
             getPoints().addPoint(click);
-            getTrack().addPoint(side, click);
+            getTrack().addPoint(activeSide, click);
         } else {
             message = HintLabels.WRONG_START;
         }
@@ -109,12 +107,12 @@ public class TrackBuilder extends TrackEditor {
      * @return points as polyline
      */
     private void generateFinishTurns() {
-        Polyline oppLine = getTrack().getLine(oppSide);
-        Point start = oppLine.getPreLast();
-        Point finish = oppLine.getLast();
+        Polyline oppLine = getTrack().getLine(activeSide.getOppositeSide());
+        Point lastSegmentStart = oppLine.getPreLast();
+        Point lastSegmentEnd = oppLine.getLast();
 
-        int quad = TrackUtils.findQuad(start, finish);
-        setPoints(TrackUtils.generateGoalPoints(quad, finish, side));
+        int quad = TrackUtils.findQuad(lastSegmentStart, lastSegmentEnd);
+        setPoints(TrackUtils.generateGoalPoints(quad, lastSegmentEnd, activeSide));
     }
 
     /**
@@ -123,7 +121,7 @@ public class TrackBuilder extends TrackEditor {
      * @param click is point where user clicked
      */
     private void addPointToTrack(Point click) {
-        getTrack().addPoint(side, click);
+        getTrack().addPoint(activeSide, click);
 
         boolean ready = getTrack().isReadyForDraw() && getPoints().contains(click);
         if (ready) {
@@ -137,23 +135,23 @@ public class TrackBuilder extends TrackEditor {
     /**
      * This method validates whether is point valid in situation when second track line didn't start to build.
      *
-     * @param actLine is track line that is built
+     * @param activeLine is track line that is built
      * @param click is point where user clicked
      */
-    private void validateJustActiveLine(Polyline actLine, Point click) {
-        if (actLine.isEmpty()) {
+    private void validateJustActiveLine(Polyline activeLine, Point click) {
+        if (activeLine.isEmpty()) {
             //first point in side is drawn
             getPoints().addPoint(click);
-            getTrack().addPoint(side, click);
-        } else if (!actLine.getLast().isEqual(click)) {
+            getTrack().addPoint(activeSide, click);
+        } else if (!activeLine.getLast().isEqual(click)) {
 
             //point click is not identical with the last point in builded side
-            if (actLine.getLength() == 1) {
-                getTrack().addPoint(side, click);
-            } else if (!actLine.checkOwnCrossing(click)) {
+            if (activeLine.getLength() == 1) {
+                getTrack().addPoint(activeSide, click);
+            } else if (!activeLine.checkOwnCrossing(click)) {
                 //new edge of builded side don't cross any other edge
-                if (correctDirection(actLine, click)) {
-                    getTrack().addPoint(side, click);
+                if (correctDirection(activeLine, click)) {
+                    getTrack().addPoint(activeSide, click);
                 }
             } else {
                 message = HintLabels.CROSSING;
@@ -171,30 +169,31 @@ public class TrackBuilder extends TrackEditor {
      * @return true if <code>click</code> is possible to add
      */
     private boolean validateSecondLine(Point click) {
-        Polyline actLine = getTrack().getLine(side);
-        Polyline oppLine = getTrack().getLine(oppSide);
-        Segment trackEnd = new Segment(actLine.getLast(), oppLine.getPoint(getTrack().getIndex(oppSide)));
+        Side oppSide = activeSide.getOppositeSide();
+        Polyline activeLine = getTrack().getLine(activeSide);
+        Polyline oppositeLine = getTrack().getLine(oppSide);
+        Segment trackEnd = new Segment(activeLine.getLast(), oppositeLine.getPoint(getTrack().getIndex(oppSide)));
         boolean success = true;
 
-        if (Calc.intersectSegments(actLine.getLast(), click, getTrack().getStart()).getPosition().equals(PointPosition.Inside)) {
+        if (Calc.intersectSegments(activeLine.getLast(), click, getTrack().getStart()).getPosition().equals(PointPosition.Inside)) {
             message = HintLabels.THROUGH_START;
             success = false;
-        } else if (actLine.getLength() == 1 && Calc.sidePosition(click, trackEnd) != side) {
+        } else if (activeLine.getLength() == 1 && Calc.sidePosition(click, trackEnd) != activeSide) {
             // check if new side is building on right direction from the start
             message = HintLabels.FORWARD;
             success = false;
-        } else if (actLine.checkOwnCrossing(click)) {
+        } else if (activeLine.checkOwnCrossing(click)) {
             // check crossing of constructed side:
             message = HintLabels.CROSSING;
             success = false;
-        } else if (oppLine.checkSegmentCrossing(actLine.getLast(), click)) {
+        } else if (oppositeLine.checkSegmentCrossing(activeLine.getLast(), click)) {
             // check crossing of opposite side:
             message = HintLabels.CROSSING;
             success = false;
-        } else if (!correctDirection(actLine, click)) {
+        } else if (!correctDirection(activeLine, click)) {
             //check bad direction of constructed side
             success = false;
-        } else if (!getTrack().freeDrawing(side, oppSide)) {
+        } else if (!getTrack().freeDrawing(activeSide, oppSide)) {
             calculateTrackIndexes(click);
         }
 
@@ -203,8 +202,9 @@ public class TrackBuilder extends TrackEditor {
 
     private void calculateTrackIndexes(Point click) {
         //turn is OK but it is necessary to check "building index" on opposite side
-        Polyline actLine = getTrack().getLine(side);
-        Polyline oppLine = getTrack().getLine(oppSide);
+        Side oppSide = activeSide.getOppositeSide();
+        Polyline activeLine = getTrack().getLine(activeSide);
+        Polyline oppositeLine = getTrack().getLine(oppSide);
 
         boolean search = true;
         Point prev;
@@ -215,24 +215,24 @@ public class TrackBuilder extends TrackEditor {
 
         while (search) {
 
-            if (index > oppLine.getLength() - 2) {
+            if (index > oppositeLine.getLength() - 2) {
                 search = false;
             } else {
 
-                if (index < oppLine.getLength() - 2) {
+                if (index < oppositeLine.getLength() - 2) {
                     //create next segment that should be crossed by point click:
-                    prev = oppLine.getPoint(index);
-                    center = oppLine.getPoint(index + 1);
-                    next = oppLine.getPoint(index + 2);
+                    prev = oppositeLine.getPoint(index);
+                    center = oppositeLine.getPoint(index + 1);
+                    next = oppositeLine.getPoint(index + 2);
                 } else {
-                    prev = oppLine.getPoint(index - 1);
-                    center = oppLine.getPoint(index);
-                    next = oppLine.getPoint(index + 1);
+                    prev = oppositeLine.getPoint(index - 1);
+                    center = oppositeLine.getPoint(index);
+                    next = oppositeLine.getPoint(index + 1);
                 }
 
-                sidePoint = Calc.calculateAngle(prev, center, next, side);
+                sidePoint = Calc.calculateAngle(prev, center, next, activeSide);
 
-                if (Calc.intersectSegments(actLine.getLast(), click, center, sidePoint).getPosition().contains(PointPosition.Inside)) {
+                if (Calc.intersectSegments(activeLine.getLast(), click, center, sidePoint).getPosition().contains(PointPosition.Inside)) {
                     //point click went through "control segment"
                     getTrack().setIndex(index + 1, oppSide);
                 }
@@ -240,23 +240,23 @@ public class TrackBuilder extends TrackEditor {
             index++;
 
         }
-        getTrack().setIndex(actLine.getLength(), side);
+        getTrack().setIndex(activeLine.getLength(), activeSide);
     }
 
     /**
      * It checks if the future construction move won't be backwards inside the track.
      *
-     * @param actLine is line that is builded
+     * @param activeLine is line that is builded
      * @param click is point where should be next part of the track line
      * @return true if the position of the point click is OK, false otherwise
      */
-    private boolean correctDirection(Polyline actLine, Point click) {
+    private boolean correctDirection(Polyline activeLine, Point click) {
         //check bad direction of constructed side
-        if (actLine.getLength() > 1) {
-            Segment lastSegment = actLine.getLastSegment();
-            if (Calc.sidePosition(click, lastSegment) == oppSide
+        if (activeLine.getLength() > 1) {
+            Segment lastSegment = activeLine.getLastSegment();
+            if (Calc.sidePosition(click, lastSegment) == activeSide.getOppositeSide()
                     && Calc.distance(lastSegment.getFirst(), lastSegment.getLast())
-                    >= Calc.distance(actLine.getPreLast(), Calc.baseOfAltitude(lastSegment, click))) {
+                    >= Calc.distance(activeLine.getPreLast(), Calc.baseOfAltitude(lastSegment, click))) {
                 message = HintLabels.FORWARD;
                 return false;
             }
@@ -265,16 +265,16 @@ public class TrackBuilder extends TrackEditor {
     }
 
     //=================================== FUNCTIONALITY OF GUI BUTTONS ===================================
-    public void startBuild(int side) {
-        if (getTrack().getOppLine(side).getLength() != 1) {
+    public void startBuild(Side side) {
+        if (getTrack().getLine(side.getOppositeSide()).getLength() != 1) {
             fireHint(HintLabels.EMPTY);
 
-            setSide(side);
+            setSides(side);
             generateEndPoints();
 
             repaintScene();
         } else {
-            if (side == Track.LEFT) {
+            if (side == Side.Left) {
                 fireHint(HintLabels.RIGHT_SIDE_FIRST);
             } else {
                 fireHint(HintLabels.LEFT_SIDE_FIRST);
@@ -286,25 +286,24 @@ public class TrackBuilder extends TrackEditor {
      * It generates points where the track should be finished or points where to start with second track side.
      */
     public void generateEndPoints() {
-        if (getTrack().getOppLine(side).getLength() > 1 && getTrack().getLine(side).isEmpty()) {
+        Side oppSide = activeSide.getOppositeSide();
+        if (getTrack().getLine(oppSide).getLength() > 1 && getTrack().getLine(activeSide).isEmpty()) {
             generateStartTurns();
-        } else if (getTrack().getOppLine(side).getLength() > 1 && !getTrack().getLine(side).isEmpty()) {
+        } else if (getTrack().getLine(oppSide).getLength() > 1 && !getTrack().getLine(activeSide).isEmpty()) {
             generateFinishTurns();
         }
     }
 
-    private void setSide(int side) {
-        this.side = side;
+    private void setSides(Side active) {
+        this.activeSide = active;
 
-        if (side == Track.LEFT) {
+        if (active == Side.Left) {
             setStage(BUILD_LEFT);
-            this.oppSide = Track.RIGHT;
         } else {
             setStage(BUILD_RIGHT);
-            this.oppSide = Track.LEFT;
         }
 
-        getTrack().setWidth(side);
+        getTrack().setWidth(active);
     }
 
     public void startEditing() {
@@ -328,13 +327,14 @@ public class TrackBuilder extends TrackEditor {
     public void deletePoint() {
         fireHint(HintLabels.EMPTY);
         removeLast();
+        Side oppSide = activeSide.getOppositeSide();
 
-        int actSize = getTrack().getLine(side).getLength();
+        int actSize = getTrack().getLine(activeSide).getLength();
         int oppSize = getTrack().getLine(oppSide).getLength();
 
         if (actSize == 1) {
             //when side has just one point, it will be added to list of points that will be draw
-            getPoints().addPoint(getTrack().getLine(side).getLast());
+            getPoints().addPoint(getTrack().getLine(activeSide).getLast());
         } else if (actSize == 0) {
 
             //if last point of side is deleted, start points will be generated
@@ -352,9 +352,9 @@ public class TrackBuilder extends TrackEditor {
     }
 
     private void removeLast() {
-        getTrack().removeLastPoint(side);
-        if (!getTrack().getLine(side).isEmpty()) {
-            boolean ready = getTrack().isReady() && getPoints().contains(getTrack().getLine(side).getLast());
+        getTrack().removeLastPoint(activeSide);
+        if (!getTrack().getLine(activeSide).isEmpty()) {
+            boolean ready = getTrack().isReady() && getPoints().contains(getTrack().getLine(activeSide).getLast());
             fireTrackReady(ready);
         }
     }
@@ -366,12 +366,12 @@ public class TrackBuilder extends TrackEditor {
      * @return points as polyline
      */
     private void generateStartTurns() {
-        Polyline oppLine = getTrack().getLine(oppSide);
+        Polyline oppLine = getTrack().getLine(activeSide.getOppositeSide());
         Point start = oppLine.getPoint(0);
         Point finish = oppLine.getPoint(1);
 
         int quad = TrackUtils.findQuad(start, finish);
-        setPoints(TrackUtils.generateGoalPoints(quad, start, side));
+        setPoints(TrackUtils.generateGoalPoints(quad, start, activeSide));
     }
 
     public void clearScene() {

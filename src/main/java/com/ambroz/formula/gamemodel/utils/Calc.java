@@ -6,13 +6,13 @@ import java.util.List;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.enums.PointPosition;
+import com.ambroz.formula.gamemodel.enums.Side;
 import com.ambroz.formula.gamemodel.race.Turn;
-import com.ambroz.formula.gamemodel.track.Track;
 
 /**
  * This is a class with different mathematical operations and methods which are static.
  *
- * @author Jiri Ambroz
+ * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
 public abstract class Calc {
 
@@ -239,10 +239,10 @@ public abstract class Calc {
      * @param prev is first point
      * @param mid is second point
      * @param next is third point
-     * @param side is side from polyline where new point should be created (1 means left, 2 means right)
+     * @param side is side from polyline where new point should be created (Side.Left or Side.Right)
      * @return point in the angle axis on given side from polyline
      */
-    public static Point calculateAngle(Point prev, Point mid, Point next, int side) {
+    public static Point calculateAngle(Point prev, Point mid, Point next, Side side) {
         double a = distance(mid, next);
         double b = distance(prev, mid);
         double c = distance(prev, next);
@@ -256,7 +256,7 @@ public abstract class Calc {
             //subtrack angle from 180°
             gamma = 2 * Math.PI - gamma;
         }
-        if (side == Track.RIGHT) {
+        if (side == Side.Right) {
             gamma = -gamma;
         }
         return rotatePoint(prev, mid, gamma / 2, 10);
@@ -359,7 +359,7 @@ public abstract class Calc {
         return Math.sqrt(side * side + speed * speed);
     }
 
-    public static Point rightAngle(Segment edge, int side) {
+    public static Point rightAngle(Segment edge, Side side) {
         //kolmice z posledniho bodu vstupni usecky:
         Point start = edge.getLast();//z tohoto bodu bude spustena kolmice
         //smerovy vektor pro vychozi hranu na delsi strane:
@@ -368,7 +368,7 @@ public abstract class Calc {
         double nx;
         double ny;
         double t = 1000;
-        if (side == Track.LEFT) {
+        if (side == Side.Left) {
             nx = uy;
             ny = -ux;
         } else {
@@ -388,7 +388,7 @@ public abstract class Calc {
      * @param colLine kolizni usecka, od ktere se uvazuje poloha bodu
      * @return 1 if point si on the left or 2 if it is on the right
      */
-    public static int sidePosition(Point center, Segment colLine) {
+    public static Side sidePosition(Point center, Segment colLine) {
         double ux = colLine.getLast().x - colLine.getFirst().x;
         double uy = colLine.getLast().y - colLine.getFirst().y;
         double vx = center.x - colLine.getFirst().x;
@@ -396,9 +396,9 @@ public abstract class Calc {
 
         double t = ux * vy - uy * vx; // skalarni soucin dvou vektoru
         if (t >= 0) {
-            return Track.RIGHT;
+            return Side.Right;
         } else {
-            return Track.LEFT;
+            return Side.Left;
         }
     }
 

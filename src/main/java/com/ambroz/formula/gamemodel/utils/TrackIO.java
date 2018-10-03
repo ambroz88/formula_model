@@ -11,8 +11,8 @@ import java.util.logging.Logger;
 
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
+import com.ambroz.formula.gamemodel.enums.Side;
 import com.ambroz.formula.gamemodel.track.Track;
-
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,9 +20,9 @@ import org.json.JSONObject;
 
 /**
  *
- * @author Jiri Ambroz
+ * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
-public final class TrackIO {
+public abstract class TrackIO {
 
     public static List<String> getAvailableTracks() {
         List<String> tracks = new ArrayList<>();
@@ -47,23 +47,24 @@ public final class TrackIO {
         obj.put("width", track.getMaxWidth());
         obj.put("height", track.getMaxHeight());
 
-        // save left barrier
-        List<List<Integer>> leftSide = new ArrayList<>();
-        Polyline left = track.getLine(Track.LEFT);
-        for (int i = 0; i < left.getLength(); i++) {
-            leftSide.add(new ArrayList<>(Arrays.asList(left.getPoint(i).getX(), left.getPoint(i).getY())));
-        }
-        obj.put("left", leftSide);
+        obj.put("left", transformTrackLine(track, Side.Left));
 
-        // save right barrier
-        List<List<Integer>> rightSide = new ArrayList<>();
-        Polyline right = track.getLine(Track.RIGHT);
-        for (int i = 0; i < right.getLength(); i++) {
-            rightSide.add(new ArrayList<>(Arrays.asList(right.getPoint(i).getX(), right.getPoint(i).getY())));
-        }
-        obj.put("right", rightSide);
+        obj.put("right", transformTrackLine(track, Side.Right));
 
-        //save to file
+        trackToFile(name, obj);
+    }
+
+    private static List<List<Integer>> transformTrackLine(Track track, Side side) {
+        List<List<Integer>> pointList = new ArrayList<>();
+        Polyline trackLine = track.getLine(side);
+
+        for (int i = 0; i < trackLine.getLength(); i++) {
+            pointList.add(new ArrayList<>(Arrays.asList(trackLine.getPoint(i).getX(), trackLine.getPoint(i).getY())));
+        }
+        return pointList;
+    }
+
+    private static void trackToFile(String name, JSONObject obj) throws JSONException, IOException {
         String filePath = getTrackFilePath(name + ".json");
         try {
             try (FileWriter file = new FileWriter(filePath)) {
@@ -81,31 +82,11 @@ public final class TrackIO {
         try {
             JSONObject jsonObject = new JSONObject(FileIO.readFileToString(filePath));
 
-            String X;
-            String Y;
-            List<Object> coordinatesArray;
-
             // load left barrier
-            JSONArray leftSide = jsonObject.getJSONArray("left");
-            Polyline left = new Polyline();
-
-            for (Object pointObject : leftSide.toList()) {
-                coordinatesArray = (List) pointObject;
-                X = coordinatesArray.get(0).toString();
-                Y = coordinatesArray.get(1).toString();
-                left.addPoint(new Point(Integer.valueOf(X), Integer.valueOf(Y)));
-            }
+            Polyline left = loadTrackLine(jsonObject.getJSONArray("left"));
 
             // load right barrier
-            JSONArray rightSide = jsonObject.getJSONArray("right");
-            Polyline right = new Polyline();
-
-            for (Object pointObject : rightSide.toList()) {
-                coordinatesArray = (List) pointObject;
-                X = coordinatesArray.get(0).toString();
-                Y = coordinatesArray.get(1).toString();
-                right.addPoint(new Point(Integer.valueOf(X), Integer.valueOf(Y)));
-            }
+            Polyline right = loadTrackLine(jsonObject.getJSONArray("right"));
 
             // load game properties
             String width = jsonObject.get("width").toString();
@@ -119,10 +100,27 @@ public final class TrackIO {
             track.setMaxWidth(Integer.valueOf(width));
             track.setMaxHeight(Integer.valueOf(height));
             return track;
+
         } catch (IOException | JSONException ex) {
             Logger.getLogger(Track.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
+    }
+
+    private static Polyline loadTrackLine(JSONArray pointArray) throws NumberFormatException {
+        List<Object> coordinatesArray;
+        String X;
+        String Y;
+        Polyline line = new Polyline();
+
+        for (Object pointObject : pointArray.toList()) {
+            coordinatesArray = (List) pointObject;
+            X = coordinatesArray.get(0).toString();
+            Y = coordinatesArray.get(1).toString();
+            line.addPoint(new Point(Integer.valueOf(X), Integer.valueOf(Y)));
+        }
+
+        return line;
     }
 
     public static void deleteTrack(String name) {

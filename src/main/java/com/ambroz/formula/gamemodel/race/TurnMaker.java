@@ -200,6 +200,7 @@ public class TurnMaker {
         Point finish = Calc.intersectSegments(lastFormulaMove, track.getFinish());
 
         if (finish.getPosition().equals(PointPosition.Inside)) {
+
             //tah protina cilovou caru:
             if (selectedTurn.getCollision() != null) {
                 evalateFinishColision(selectedTurn, finish);
@@ -207,7 +208,9 @@ public class TurnMaker {
                 selectedTurn.setCollision(new Collision(finish, track.getFinish()));
                 selectedTurn.setPosition(PointPosition.Finish);
             }
+
         } else if (finish.getPosition().equals(PointPosition.Edge)) {
+
             //tah se dotyka cilove cary:
             if (selectedTurn.getCollision() != null) {
                 evalateFinishColision(selectedTurn, finish);
@@ -215,6 +218,17 @@ public class TurnMaker {
                 selectedTurn.setCollision(new Collision(finish, track.getFinish()));
                 selectedTurn.setPosition(PointPosition.FinishLine);
             }
+
+        } else {
+
+            Point start = Calc.intersectSegments(lastFormulaMove, track.getStart());
+            if (start.getPosition().equals(PointPosition.Inside)) {
+                //tah protina startovni caru:
+                if (selectedTurn.getCollision() != null) {
+                    evalateStartColision(selectedTurn, start);
+                }
+            }
+
         }
 
     }
@@ -225,7 +239,16 @@ public class TurnMaker {
             //hrac protne cil pred narazem
             selectedTurn.setCollision(new Collision(finishColision, model.getTrack().getFinish()));
             selectedTurn.setPosition(PointPosition.Finish);
-//            selectedTurn.setType(Turn.FREE);
+        }
+    }
+
+    private void evalateStartColision(Turn selectedTurn, Point startColision) {
+        Point last = getFormula(formulaID).getLast();
+        if (Calc.distance(last, startColision)
+                < Calc.distance(last, selectedTurn.getCollision().getCollisionPoint())) {
+            //hrac protne start pred narazem
+            startColision.setPosition(PointPosition.CollisionRight);
+            selectedTurn.setCollision(new Collision(startColision, model.getTrack().getStart()));
         }
     }
 

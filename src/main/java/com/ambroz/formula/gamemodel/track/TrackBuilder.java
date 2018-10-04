@@ -2,6 +2,8 @@ package com.ambroz.formula.gamemodel.track;
 
 import java.io.IOException;
 
+import static com.ambroz.formula.gamemodel.utils.Calc.rotatePoint;
+
 import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
@@ -10,7 +12,6 @@ import com.ambroz.formula.gamemodel.enums.PointPosition;
 import com.ambroz.formula.gamemodel.enums.Side;
 import com.ambroz.formula.gamemodel.labels.HintLabels;
 import com.ambroz.formula.gamemodel.utils.Calc;
-import static com.ambroz.formula.gamemodel.utils.Calc.rotatePoint;
 import com.ambroz.formula.gamemodel.utils.TrackIO;
 import com.ambroz.formula.gamemodel.utils.TrackUtils;
 
@@ -22,7 +23,6 @@ import com.ambroz.formula.gamemodel.utils.TrackUtils;
  */
 public class TrackBuilder extends TrackEditor {
 
-    public static final int DIMENSION = 300;
     public static final int BUILD_LEFT = 1;
     public static final int BUILD_RIGHT = 2;
     public static final int EDIT_PRESS = 3;
@@ -36,14 +36,8 @@ public class TrackBuilder extends TrackEditor {
     public TrackBuilder(Paper paper) {
         super(paper);
         points = new Polyline();
-        setupPaper();
         activeSide = Side.Left;
         setStage(BUILD_LEFT);
-    }
-
-    private void setupPaper() {
-        getPaper().setHeight(DIMENSION);
-        getPaper().setWidth(DIMENSION);
     }
 
     /**

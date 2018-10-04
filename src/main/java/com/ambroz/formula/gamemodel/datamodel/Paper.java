@@ -3,12 +3,13 @@ package com.ambroz.formula.gamemodel.datamodel;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  *
  * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
 public class Paper extends PropertyChanger {
+
+    public static final int DIMENSION = 300;
 
     private List<Segment> horizontal;
     private List<Segment> vertical;
@@ -20,8 +21,8 @@ public class Paper extends PropertyChanger {
      * It calculates two polylines which compose square paper.
      */
     public Paper() {
-        this.width = 90;
-        this.height = 50;
+        this.width = DIMENSION;
+        this.height = DIMENSION;
         gridSize = 15;
         updateGrid();
     }
@@ -38,7 +39,7 @@ public class Paper extends PropertyChanger {
         }
         //create horizontal lines of square paper
         for (int y = 0; y <= getHeight(); y++) {
-            vertical.add(new Segment(new Point(0, y), new Point(getWidth(), y)));
+            horizontal.add(new Segment(new Point(0, y), new Point(getWidth(), y)));
         }
     }
 

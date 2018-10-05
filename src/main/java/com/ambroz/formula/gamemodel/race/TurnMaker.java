@@ -5,6 +5,7 @@ import java.util.HashMap;
 import com.ambroz.formula.gamemodel.datamodel.Collision;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
+import com.ambroz.formula.gamemodel.datamodel.RaceOptions;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.enums.FormulaType;
 import com.ambroz.formula.gamemodel.enums.PointPosition;
@@ -16,16 +17,12 @@ import com.ambroz.formula.gamemodel.utils.Calc;
  *
  * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
-public class TurnMaker {
-
-    public static final int FOUR_TURNS = 4;
-    public static final int FIVE_TURNS = 5;
-    public static final int NINE_TURNS = 9;
+public class TurnMaker extends RaceOptions {
 
     private final RaceModel model;
     private final HashMap<Integer, Formula> racers;
     private final Turns turns;
-    private int turnsCount;
+
     private int formulaID;
 
     public TurnMaker(RaceModel menu) {
@@ -35,7 +32,6 @@ public class TurnMaker {
         racers.put(formulaID, new Formula(FormulaType.Player));
 
         turns = new Turns();
-        turnsCount = 4;
     }
 
     public void firstTurn(Point click) {
@@ -87,7 +83,7 @@ public class TurnMaker {
      */
     private void nextTurn(int formOnTurn, Point rivalLast) {
         Point center = racers.get(formOnTurn).calculateNextCenter();
-        getTurns().createStandardTurn(center, turnsCount);
+        getTurns().createStandardTurn(center, getTurnsCount());
         divideTurns(rivalLast);
     }
 
@@ -321,10 +317,6 @@ public class TurnMaker {
 
     public void resetTurns() {
         turns.reset();
-    }
-
-    public void setTurnsCount(int turnsCount) {
-        this.turnsCount = turnsCount;
     }
 
     public Turns getTurns() {

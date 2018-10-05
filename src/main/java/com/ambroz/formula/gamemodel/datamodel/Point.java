@@ -49,21 +49,6 @@ public class Point {
     }
 
     /**
-     * It converts panel coordinates into grid coordinates.
-     * <br>Examples of conversions when grid size is 10:
-     * <br>Point[145;53] is converted into Point[15;5]
-     * <br>Point[154;47] is converted into Point[15;5]
-     *
-     * @param gridSize is the size of the grid
-     */
-    public void toGridUnits(int gridSize) {
-        double roundX = Math.round(x / gridSize) * gridSize;
-        double roundY = Math.round(y / gridSize) * gridSize;
-        x = Math.round(roundX / gridSize);
-        y = Math.round(roundY / gridSize);
-    }
-
-    /**
      * This method checks this <code>point</code> has the same coordinates like point p.
      *
      * @param p point which we want to check.

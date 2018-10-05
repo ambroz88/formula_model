@@ -407,4 +407,16 @@ public abstract class Calc {
         return new Point((int) X, (int) Y);
     }
 
+    /**
+     * This method rounds given number to closest higher multiple of defined place value. E.g. 42 is rounded to 50 when
+     * place value is 10 and 68 is rounded to 70.
+     *
+     * @param number is given number that will be rounded
+     * @param placeValue is place value in which will be searched the result
+     * @return closest higher number in defined place value
+     */
+    public static int ceilingOnPlaceValue(double number, int placeValue) {
+        return (int) (Math.ceil(number / placeValue) * placeValue);
+    }
+
 }

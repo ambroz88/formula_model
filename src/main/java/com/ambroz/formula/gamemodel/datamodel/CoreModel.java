@@ -3,6 +3,7 @@ package com.ambroz.formula.gamemodel.datamodel;
 import com.ambroz.formula.gamemodel.enums.Language;
 import com.ambroz.formula.gamemodel.labels.HintLabels;
 import com.ambroz.formula.gamemodel.track.Track;
+import com.ambroz.formula.gamemodel.utils.Calc;
 
 /**
  *
@@ -63,6 +64,8 @@ public class CoreModel extends PropertyChanger {
 
     public void setTrack(Track track) {
         this.track = track;
+        getPaper().setWidth(Calc.ceilingOnPlaceValue(track.getMaxWidth(), 10));
+        getPaper().setHeight(Calc.ceilingOnPlaceValue(track.getMaxHeight(), 10));
     }
 
     public Paper getPaper() {

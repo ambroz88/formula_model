@@ -57,10 +57,11 @@ public class RaceModel extends CoreModel {
     }
 
     public void prepareGame(Track track) {
-        if (getTrack() != null) {
+        if (!track.isEmpty()) {
             setTrack(track);
             resetGame();
             fireHint(HintLabels.START_POSITION);
+            firePropertyChange("newGame", false, true);
         }
     }
 
@@ -78,8 +79,7 @@ public class RaceModel extends CoreModel {
      * @param count is number of rounds that player will be wait for other player
      */
     public void fireCrash(int count) {
-//        String text = hintLabels.getValue(HintLabels.OUCH) + " " + turnMaker.getFormula(turnMaker.getActID()).getName() + " "
-        String text = hintLabels.getValue(HintLabels.OUCH) + " Player "
+        String text = hintLabels.getValue(HintLabels.OUCH) + " " + turnMaker.getFormula(turnMaker.getFormulaID()).getName() + " "
                 + hintLabels.getValue(HintLabels.CRASH) + " " + count + "!!!";
         //cought by HintPanel
         firePropertyChange("crash", "", text);

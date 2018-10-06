@@ -30,8 +30,8 @@ public class Formula extends Polyline {
         speed = 1; //size of movement on axis Y
         side = 0; //size of movement on axis X
         winner = false;
-        moves = 1; //numbers of turns of this formula
-        length = 1;
+        moves = 0; //numbers of turns of this formula
+        length = 0;
         wait = 0;
         type = formulaType;
     }
@@ -42,8 +42,8 @@ public class Formula extends Polyline {
     public void reset() {
         winner = false;
         points.clear();
-        moves = 1;
-        length = 1;
+        moves = 0;
+        length = 0;
         wait = 0;
         firePropertyChange("reset", false, true);
     }
@@ -51,12 +51,28 @@ public class Formula extends Polyline {
     @Override
     public void addPoint(Point p) {
         super.addPoint(p);
+        if (getLength() > 1) {
+            movesUp();
+            lengthUp();
+        }
     }
 
     public void addCollisionPoint() {
         if (getCollision() != null) {
             super.addPoint(getCollision().getCollisionPoint());
+            lengthUp();
         }
+    }
+
+    private void movesUp() {
+        movesUp(1);
+    }
+
+    /**
+     * This method updates the distance of the formula about the distance between two last points.
+     */
+    private void lengthUp() {
+        lengthUp(getLast(), getPreLast());
     }
 
     public FormulaType getType() {
@@ -226,10 +242,6 @@ public class Formula extends Polyline {
         return wait;
     }
 
-    public void movesUp() {
-        movesUp(1);
-    }
-
     public void movesUp(int count) {
         moves = moves + count;
         firePropertyChange("move", 0, moves);
@@ -237,13 +249,6 @@ public class Formula extends Polyline {
 
     public int getMoves() {
         return moves;
-    }
-
-    /**
-     * This method updates the distance of the formula about the distance between two last points.
-     */
-    public void lengthUp() {
-        lengthUp(getLast(), getPreLast());
     }
 
     /**

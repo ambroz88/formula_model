@@ -27,6 +27,7 @@ public class RaceOptions {
     public RaceOptions() {
         turnsCount = FOUR_TURNS;
         lengthHist = LENGTH_MAX;
+        finishType = WIN_FIRST;
     }
 
     public int getTurnsCount() {

@@ -329,6 +329,10 @@ public class Track extends PropertyChanger {
                 && rightIndex == getRight().getLength() - 1 && getRight().getLength() > 1);
     }
 
+    public boolean isEmpty() {
+        return getLeft().isEmpty() && getRight().isEmpty();
+    }
+
     /**
      * This method returns coordinates X and Y of whole track in order: left side, right side from the end to the start.
      * Also the length (in squares) of the left and right side is measured.

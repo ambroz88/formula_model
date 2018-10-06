@@ -29,7 +29,9 @@ public class TurnMaker extends RaceOptions {
         this.model = menu;
         formulaID = 1;
         racers = new HashMap<>();
-        racers.put(formulaID, new Formula(FormulaType.Player));
+        Formula alfred = new Formula(FormulaType.Player);
+        alfred.setName("Alfred");
+        racers.put(formulaID, alfred);
 
         turns = new Turns();
     }
@@ -56,7 +58,6 @@ public class TurnMaker extends RaceOptions {
             if (selectedTurn.getCollision() == null || selectedTurn.getPosition().contains(PointPosition.Finish)) {
 
                 act.addPoint(click);
-                act.movesUp();
                 checkFinishTurn(selectedTurn, click);
                 nextTurn(formulaID, act.getLast());
 
@@ -89,7 +90,6 @@ public class TurnMaker extends RaceOptions {
 
     private void handleCrashTurn(Point click, Turn selectedTurn) {
         Formula active = getFormula(formulaID);
-        active.movesUp();
         active.setCollision(selectedTurn.getCollision());
 
         int maxSpeed = active.maxSpeed(click);
@@ -97,7 +97,6 @@ public class TurnMaker extends RaceOptions {
         active.movesUp(maxSpeed);
 
         active.addCollisionPoint();
-        active.lengthUp();
 
         Point crashCenter = TurnCalculations.generateCrashCenter(active);
         active.addPoint(crashCenter);

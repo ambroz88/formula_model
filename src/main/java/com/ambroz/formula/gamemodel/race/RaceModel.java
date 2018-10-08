@@ -59,18 +59,28 @@ public class RaceModel extends CoreModel {
     public void prepareGame(Track track) {
         if (!track.isEmpty()) {
             setTrack(track);
-            resetGame();
-            fireHint(HintLabels.START_POSITION);
-            firePropertyChange(RACE_NEW_GAME, false, true);
+            resetPlayers();
         }
     }
 
     /**
-     * Method for clearing whole scene: track, formulas and points.
+     * Method for clearing formulas and points.
      */
-    public void resetGame() {
+    public void resetPlayers() {
+        for (int i = 1; i <= turnMaker.getFormulaCount(); i++) {
+            turnMaker.getFormula(i).reset();
+        }
+        turnMaker.resetTurns();
+        repaintScene();
+    }
+
+    public void startGame() {
+        turnMaker.startPosition(getTrack().getStart());
         setStage(FIRST_TURN);
-        resetPlayers();
+
+        fireHint(HintLabels.START_POSITION);
+        firePropertyChange(RACE_NEW_GAME, false, true);
+        repaintScene();
     }
 
     /**
@@ -83,19 +93,6 @@ public class RaceModel extends CoreModel {
                 + hintLabels.getValue(HintLabels.CRASH) + " " + count + "!!!";
         //cought by HintPanel
         firePropertyChange(RACE_CRASH, "", text);
-    }
-
-    /**
-     * Method for clearing formulas and points.
-     */
-    public void resetPlayers() {
-        for (int i = 1; i <= turnMaker.getFormulaCount(); i++) {
-            turnMaker.getFormula(i).reset();
-        }
-        turnMaker.resetTurns();
-
-        turnMaker.startPosition(getTrack().getStart());
-        repaintScene();
     }
 
     public TurnMaker getTurnMaker() {

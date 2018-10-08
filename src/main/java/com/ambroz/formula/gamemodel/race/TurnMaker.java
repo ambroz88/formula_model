@@ -12,6 +12,7 @@ import com.ambroz.formula.gamemodel.enums.PointPosition;
 import com.ambroz.formula.gamemodel.enums.Side;
 import com.ambroz.formula.gamemodel.track.Track;
 import com.ambroz.formula.gamemodel.utils.Calc;
+import com.ambroz.formula.gamemodel.utils.TurnCalculations;
 
 /**
  *
@@ -40,7 +41,7 @@ public class TurnMaker extends RaceOptions {
         Turn selectedTurn = turns.containsTurn(click);
         if (selectedTurn != null) {
 
-            Formula act = getFormula(formulaID);
+            Formula act = getActiveFormula();
             act.addPoint(click);
             act.addPoint(new Point(click.x + act.getSide(), click.y + act.getSpeed()));
 
@@ -54,7 +55,7 @@ public class TurnMaker extends RaceOptions {
         Turn selectedTurn = turns.containsTurn(click);
         if (selectedTurn != null) {
 
-            Formula act = getFormula(formulaID);
+            Formula act = getActiveFormula();
             if (selectedTurn.getCollision() == null || selectedTurn.getPosition().contains(PointPosition.Finish)) {
 
                 act.addPoint(click);
@@ -70,7 +71,7 @@ public class TurnMaker extends RaceOptions {
     private void checkFinishTurn(Turn selectedTurn, Point click) {
         if (selectedTurn.getPosition().contains(PointPosition.Finish)
                 && Side.Left == Calc.sidePosition(click, model.getTrack().getFinish())) {
-            Formula act = getFormula(formulaID);
+            Formula act = getActiveFormula();
             act.lengthUp(act.getPreLast(), selectedTurn.getCollision().getCollisionPoint());
             act.setWin(true);
         }
@@ -89,7 +90,7 @@ public class TurnMaker extends RaceOptions {
     }
 
     private void handleCrashTurn(Point click, Turn selectedTurn) {
-        Formula active = getFormula(formulaID);
+        Formula active = getActiveFormula();
         active.setCollision(selectedTurn.getCollision());
 
         int maxSpeed = active.maxSpeed(click);
@@ -116,7 +117,7 @@ public class TurnMaker extends RaceOptions {
     private void divideTurns(Point rivalLast) {
         Turn selectedTurn;
         Segment lastFormulaMove;
-        Point lastPoint = getFormula(formulaID).getLast();
+        Point lastPoint = getActiveFormula().getLast();
 
         for (int i = 0; i < turns.getSize(); i++) {
             selectedTurn = turns.getTurn(i);
@@ -229,8 +230,8 @@ public class TurnMaker extends RaceOptions {
     }
 
     private void evalateFinishColision(Turn selectedTurn, Point finishColision) {
-        if (Calc.distance(getFormula(formulaID).getLast(), finishColision)
-                < Calc.distance(getFormula(formulaID).getLast(), selectedTurn.getCollision().getCollisionPoint())) {
+        if (Calc.distance(getActiveFormula().getLast(), finishColision)
+                < Calc.distance(getActiveFormula().getLast(), selectedTurn.getCollision().getCollisionPoint())) {
             //hrac protne cil pred narazem
             selectedTurn.setCollision(new Collision(finishColision, model.getTrack().getFinish()));
             selectedTurn.setPosition(PointPosition.Finish);
@@ -238,9 +239,8 @@ public class TurnMaker extends RaceOptions {
     }
 
     private void evalateStartColision(Turn selectedTurn, Point startColision) {
-        Point last = getFormula(formulaID).getLast();
-        if (Calc.distance(last, startColision)
-                < Calc.distance(last, selectedTurn.getCollision().getCollisionPoint())) {
+        if (Calc.distance(getActiveFormula().getLast(), startColision)
+                < Calc.distance(getActiveFormula().getLast(), selectedTurn.getCollision().getCollisionPoint())) {
             //hrac protne start pred narazem
             startColision.setPosition(PointPosition.CollisionRight);
             selectedTurn.setCollision(new Collision(startColision, model.getTrack().getStart()));
@@ -272,16 +272,16 @@ public class TurnMaker extends RaceOptions {
     }
 
     private Point createVerticalStartPoints(Point first, Point second) {
-        getFormula(formulaID).setSpeed(0);
+        getActiveFormula().setSpeed(0);
         int startY;
 
         if (second.getY() > first.getY()) {
             //direction of first move will be to the right
-            getFormula(formulaID).setSide(1);
+            getActiveFormula().setSide(1);
             startY = first.getY();
         } else {
             //direction of first move will be to the left
-            getFormula(formulaID).setSide(-1);
+            getActiveFormula().setSide(-1);
             startY = second.getY();
         }
 
@@ -289,16 +289,16 @@ public class TurnMaker extends RaceOptions {
     }
 
     private Point createHorizontalStartPositions(Point first, Point second) {
-        getFormula(formulaID).setSide(0);
+        getActiveFormula().setSide(0);
         int startX;
 
         if (second.getX() > first.getX()) {
             //direction of first move will be down
-            getFormula(formulaID).setSpeed(-1);
+            getActiveFormula().setSpeed(-1);
             startX = first.getX();
         } else {
             //direction of first move will be up
-            getFormula(formulaID).setSpeed(1);
+            getActiveFormula().setSpeed(1);
             startX = second.getX();
         }
 
@@ -308,6 +308,10 @@ public class TurnMaker extends RaceOptions {
     //---------------------------------------------------------------------------
     public int getFormulaCount() {
         return racers.size();
+    }
+
+    public Formula getActiveFormula() {
+        return getFormula(formulaID);
     }
 
     public Formula getFormula(int id) {

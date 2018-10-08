@@ -2,8 +2,6 @@ package com.ambroz.formula.gamemodel.track;
 
 import java.io.IOException;
 
-import static com.ambroz.formula.gamemodel.utils.Calc.rotatePoint;
-
 import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
@@ -226,7 +224,7 @@ public class TrackBuilder extends TrackEditor {
                 }
 
                 angle = Calc.calculateAngle(prev, center, next, activeSide);
-                sidePoint = rotatePoint(prev, center, angle / 2, 10);
+                sidePoint = Calc.rotatePoint(prev, center, angle / 2, 10);
 
                 if (Calc.intersectSegments(activeLine.getLast(), click, center, sidePoint).getPosition().contains(PointPosition.Inside)) {
                     //point click went through "control segment"
@@ -382,8 +380,8 @@ public class TrackBuilder extends TrackEditor {
         boolean saved;
         try {
             TrackIO.trackToJSON(getTrack(), trackName);
-            // cought by TrackTopComponent:
-            firePropertyChange("newTrack", false, true);
+            // cought by TrackListComponent:
+            firePropertyChange(TRACK_SAVED, false, true);
             fireHint(HintLabels.HINT_SAVED);
             saved = true;
         } catch (IOException ex) {
@@ -407,7 +405,7 @@ public class TrackBuilder extends TrackEditor {
     }
 
     public void fireTrackReady(boolean ready) {
-        firePropertyChange("trackReady", !ready, ready);
+        firePropertyChange(TRACK_READY, !ready, ready);
     }
 
 }

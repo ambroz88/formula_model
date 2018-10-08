@@ -2,7 +2,6 @@ package com.ambroz.formula.gamemodel.track;
 
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
-import com.ambroz.formula.gamemodel.datamodel.PropertyChanger;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.enums.Side;
 import com.ambroz.formula.gamemodel.utils.Calc;
@@ -14,7 +13,7 @@ import com.ambroz.formula.gamemodel.utils.Calc;
  *
  * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
-public class Track extends PropertyChanger {
+public class Track {
 
     public static int LIMIT_DIST = 15;
     public static int LIMIT_NEXT = 5;

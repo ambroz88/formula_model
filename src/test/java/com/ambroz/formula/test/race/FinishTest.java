@@ -8,6 +8,7 @@ import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.enums.Language;
 import com.ambroz.formula.gamemodel.race.RaceModel;
 import com.ambroz.formula.gamemodel.utils.TrackIO;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -150,6 +151,6 @@ public class FinishTest {
             model.moveWithPlayer(p);
         }
 
-        Assert.assertEquals(model.getTurnMaker().getFormula(1).getLast(), clicks.get(clicks.size() - 1));
+        Assert.assertEquals(model.getTurnMaker().getActiveFormula().getLast(), clicks.get(clicks.size() - 1));
     }
 }

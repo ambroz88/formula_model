@@ -45,7 +45,7 @@ public class Formula extends Polyline {
         moves = 0;
         length = 0;
         wait = 0;
-        firePropertyChange("reset", false, true);
+        firePropertyChange(FORMULA_RESET, false, true);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class Formula extends Polyline {
     public void setColor(int color) {
         int old = getColor();
         this.rgbColor = color;
-        firePropertyChange("color", old, color); //caught by PlayerPanel and Statistic panel
+        firePropertyChange(FORMULA_COLOUR, old, color); //caught by PlayerPanel and Statistic panel
     }
 
     public String getName() {
@@ -100,7 +100,7 @@ public class Formula extends Polyline {
     public void setName(String name) {
         String old = getName();
         this.name = name;
-        firePropertyChange("name", old, name);
+        firePropertyChange(FORMULA_NAME, old, name);
     }
 
     public void setSpeed(int speed) {
@@ -235,7 +235,7 @@ public class Formula extends Polyline {
     public void setWait(int wait) {
         int old = getWait();
         this.wait = wait;
-        firePropertyChange("stop", old, wait);
+        firePropertyChange(FORMULA_WAIT, old, wait);
     }
 
     public int getWait() {
@@ -244,7 +244,7 @@ public class Formula extends Polyline {
 
     public void movesUp(int count) {
         moves = moves + count;
-        firePropertyChange("move", 0, moves);
+        firePropertyChange(FORMULA_MOVES, 0, moves);
     }
 
     public int getMoves() {
@@ -261,7 +261,7 @@ public class Formula extends Polyline {
     public void lengthUp(Point p1, Point p2) {
         double dist = Calc.distance(p1, p2);
         length = Math.round((length + dist) * 100.0) / 100.0;
-        firePropertyChange("dist", 0, length);
+        firePropertyChange(FORMULA_DISTANCE, 0, length);
     }
 
     public double getDist() {

@@ -44,15 +44,15 @@ public class RaceModel extends CoreModel {
     }
 
     private void checkWinner() {
-        if (turnMaker.getFormula(1).getWin() == true) {
+        if (turnMaker.getActiveFormula().getWin() == true) {
             winnerAnnouncement();
         }
     }
 
     private void winnerAnnouncement() {
         getTurnMaker().resetTurns();
-//        firePropertyChange("winner", "", getTurnMaker().createWinnerMessage());
-        firePropertyChange("winner", "", "Player  " + getHintLabels().getValue(HintLabels.WINNER));
+//        firePropertyChange(RACE_WINNER, "", getTurnMaker().createWinnerMessage());
+        firePropertyChange(RACE_WINNER, "", getTurnMaker().getActiveFormula().getName() + " " + getHintLabels().getValue(HintLabels.WINNER));
         setStage(GAME_OVER);
     }
 
@@ -61,7 +61,7 @@ public class RaceModel extends CoreModel {
             setTrack(track);
             resetGame();
             fireHint(HintLabels.START_POSITION);
-            firePropertyChange("newGame", false, true);
+            firePropertyChange(RACE_NEW_GAME, false, true);
         }
     }
 
@@ -79,17 +79,19 @@ public class RaceModel extends CoreModel {
      * @param count is number of rounds that player will be wait for other player
      */
     public void fireCrash(int count) {
-        String text = hintLabels.getValue(HintLabels.OUCH) + " " + turnMaker.getFormula(turnMaker.getFormulaID()).getName() + " "
+        String text = hintLabels.getValue(HintLabels.OUCH) + " " + turnMaker.getActiveFormula().getName() + " "
                 + hintLabels.getValue(HintLabels.CRASH) + " " + count + "!!!";
         //cought by HintPanel
-        firePropertyChange("crash", "", text);
+        firePropertyChange(RACE_CRASH, "", text);
     }
 
     /**
      * Method for clearing formulas and points.
      */
     public void resetPlayers() {
-        turnMaker.getFormula(1).reset();
+        for (int i = 1; i <= turnMaker.getFormulaCount(); i++) {
+            turnMaker.getFormula(i).reset();
+        }
         turnMaker.resetTurns();
 
         turnMaker.startPosition(getTrack().getStart());
@@ -102,7 +104,7 @@ public class RaceModel extends CoreModel {
 
     public void fireLoadTrack() {
         //cought by TrackListComponent
-        firePropertyChange("loadTrack", false, true);
+        firePropertyChange(RACE_LOAD_TRACK, false, true);
         fireHint(HintLabels.START_POSITION);
     }
 

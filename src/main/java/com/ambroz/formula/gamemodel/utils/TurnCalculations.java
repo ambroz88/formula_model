@@ -1,4 +1,4 @@
-package com.ambroz.formula.gamemodel.race;
+package com.ambroz.formula.gamemodel.utils;
 
 import java.util.List;
 
@@ -6,6 +6,7 @@ import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.enums.PointPosition;
 import com.ambroz.formula.gamemodel.enums.Side;
+import com.ambroz.formula.gamemodel.race.Formula;
 import com.ambroz.formula.gamemodel.utils.Calc;
 
 /**

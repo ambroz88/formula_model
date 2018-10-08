@@ -18,7 +18,6 @@ public class OptionsLabels {
     public final static String PAPER_SIZE = "paper_size";
     public final static String PAPER_WIDTH = "paper_width";
     public final static String PAPER_HEIGHT = "papet_height";
-    public final static String NOTE = "note";
     public final static String RULE_TITLE = "rule_title";
     public final static String NO_TURNS = "no_turns";
     public final static String END_RULES = "end_rules";
@@ -26,7 +25,6 @@ public class OptionsLabels {
     public final static String RULE_SECOND = "rule_second";
     public final static String RULE_COLISION = "rule_colision";
     public final static String PLAYERS = "players";
-    public final static String PLAYER = "player";
     public final static String SHOW_TURNS = "show_turns";
 
     private Properties properties;

@@ -26,35 +26,35 @@ public class CoreModel extends PropertyChanger {
 
     public void repaintScene() {
         //cought by drawing components
-        firePropertyChange("repaint", false, true);
+        firePropertyChange(REPAINT, false, true);
     }
 
     public void fireHint(String hintLabelProperty) {
         //cought by HintComponent
-        firePropertyChange("hint", null, hintLabels.getValue(hintLabelProperty));
+        firePropertyChange(HINT, null, hintLabels.getValue(hintLabelProperty));
     }
 
     public void fireCoordinates(String coordinates) {
         //cought by CoordinatesPanel
-        firePropertyChange("mouseMoving", null, coordinates);
+        firePropertyChange(MOUSE_MOVING, null, coordinates);
     }
 
     public Language getLanguage() {
         return language;
     }
 
-    public void setLanguage(Language language) {
+    public final void setLanguage(Language language) {
         String old = getLanguage().toString();
         this.language = language;
         hintLabels = new HintLabels(language.toString());
-        firePropertyChange("language", old, language.toString());
+        firePropertyChange(LANGUAGE, old, language.toString());
     }
 
     public int getStage() {
         return stage;
     }
 
-    public void setStage(int stage) {
+    public final void setStage(int stage) {
         this.stage = stage;
     }
 
@@ -62,7 +62,7 @@ public class CoreModel extends PropertyChanger {
         return track;
     }
 
-    public void setTrack(Track track) {
+    public final void setTrack(Track track) {
         this.track = track;
         getPaper().setWidth(Calc.ceilingOnPlaceValue(track.getMaxWidth(), 10));
         getPaper().setHeight(Calc.ceilingOnPlaceValue(track.getMaxHeight(), 10));

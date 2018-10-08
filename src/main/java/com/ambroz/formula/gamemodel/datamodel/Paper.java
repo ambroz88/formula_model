@@ -51,7 +51,7 @@ public class Paper extends PropertyChanger {
         int old = getWidth();
         this.width = paperWidth;
         updateGrid();
-        firePropertyChange("paperWidth", old, getWidth()); //cought by Draw and Options
+        firePropertyChange(PropertyChanger.PAPER_WIDTH, old, getWidth()); //cought by Draw and Options
     }
 
     public int getHeight() {
@@ -62,7 +62,7 @@ public class Paper extends PropertyChanger {
         int old = getHeight();
         this.height = paperHeight;
         updateGrid();
-        firePropertyChange("paperHeight", old, height); //cought by Draw and Options
+        firePropertyChange(PropertyChanger.PAPER_HEIGHT, old, height); //cought by Draw and Options
     }
 
     public int getGridSize() {
@@ -77,7 +77,7 @@ public class Paper extends PropertyChanger {
     public void setGridSize(int size) {
         int old = getGridSize();
         gridSize = size;
-        firePropertyChange("grid", old, getGridSize()); //cought by Draw
+        firePropertyChange(PropertyChanger.PAPER_GRID, old, getGridSize()); //cought by Draw
     }
 
     /**

@@ -13,6 +13,7 @@ import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
 import com.ambroz.formula.gamemodel.enums.Side;
 import com.ambroz.formula.gamemodel.track.Track;
+
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,8 +25,8 @@ import org.json.JSONObject;
  */
 public abstract class TrackIO {
 
-    public static List<String> getAvailableTracks() {
-        List<String> tracks = new ArrayList<>();
+    public static String[] getTracksArray() {
+        String[] tracks = new String[]{};
         File directory = new File("tracks");
 
         if (directory.exists()) {
@@ -33,11 +34,16 @@ public abstract class TrackIO {
             File[] trackFiles = directory.listFiles();
 
             if (trackFiles != null) {
+                tracks = new String[trackFiles.length];
+
+                int i = 0;
                 for (File track : trackFiles) {
-                    tracks.add(track.getName().substring(0, track.getName().lastIndexOf(".")));
+                    tracks[i] = track.getName().substring(0, track.getName().lastIndexOf("."));
+                    i++;
                 }
             }
         }
+
         return tracks;
     }
 

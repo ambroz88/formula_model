@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
-import com.ambroz.formula.gamemodel.enums.Language;
 import com.ambroz.formula.gamemodel.race.RaceModel;
 import com.ambroz.formula.gamemodel.utils.TrackIO;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +23,6 @@ public class StartTest {
     @Before
     public void init() {
         model = new RaceModel(new Paper());
-        model.setLanguage(Language.English);
     }
 
     @Test

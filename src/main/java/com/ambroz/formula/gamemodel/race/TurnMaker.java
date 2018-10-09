@@ -122,7 +122,7 @@ public class TurnMaker extends RaceOptions {
 
         for (int i = 0; i < turns.getSize(); i++) {
             selectedTurn = turns.getTurn(i);
-            lastFormulaMove = new Segment(selectedTurn, lastPoint);
+            lastFormulaMove = new Segment(lastPoint, selectedTurn);
 
             if (selectedTurn.isEqual(rivalLast) == false && selectedTurn.isExist()) {
 
@@ -146,12 +146,13 @@ public class TurnMaker extends RaceOptions {
             Point cross = Calc.intersectSegments(lastFormulaMove, actLeft);
 
             if (!cross.getPosition().equals(PointPosition.Outside)) {
-                //novy bod ma prunik nebo se dotyka leve krajnice
+                //novy bod ma prunik nebo se dotyka leve krajnice a je napravo od kolizni usecky
                 Segment colLine = actLeft;
-                cross.setPosition(PointPosition.CollisionLeft);
-                selectedTurn.setCollision(new Collision(cross, colLine));
-                colision = true;
-                break;
+                if (Calc.sidePosition(lastFormulaMove.getFirst(), actLeft).equals(Side.Right)) {
+                    cross.setPosition(PointPosition.CollisionLeft);
+                    selectedTurn.setCollision(new Collision(cross, colLine));
+                    colision = true;
+                }
             }
 
         }
@@ -170,10 +171,11 @@ public class TurnMaker extends RaceOptions {
             if (!cross.getPosition().equals(PointPosition.Outside)) {
                 //novy bod ma prunik nebo se dotyka prave krajnice
                 Segment colLine = actRight;
-                cross.setPosition(PointPosition.CollisionRight);
-                selectedTurn.setCollision(new Collision(cross, colLine));
-                colision = true;
-                break;
+                if (Calc.sidePosition(lastFormulaMove.getFirst(), actRight).equals(Side.Left)) {
+                    cross.setPosition(PointPosition.CollisionRight);
+                    selectedTurn.setCollision(new Collision(cross, colLine));
+                    colision = true;
+                }
             }
         }
 
@@ -184,7 +186,7 @@ public class TurnMaker extends RaceOptions {
         Segment startLine = model.getTrack().getStart();
 
         Point start = Calc.intersectSegments(lastFormulaMove, startLine);
-        if (!start.getPosition().equals(PointPosition.Outside) && Side.Right == Calc.sidePosition(lastFormulaMove.getFirst(), startLine)) {
+        if (!start.getPosition().equals(PointPosition.Outside) && Side.Right == Calc.sidePosition(lastFormulaMove.getLast(), startLine)) {
             //tah protina start a konci vpravo od nej (projel se v protismeru)
             start.setPosition(PointPosition.CollisionRight);
             selectedTurn.setCollision(new Collision(start, startLine));

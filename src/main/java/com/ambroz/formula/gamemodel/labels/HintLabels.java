@@ -5,6 +5,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ambroz.formula.gamemodel.enums.Language;
 import com.ambroz.formula.gamemodel.utils.FileIO;
 
 /**
@@ -39,7 +40,7 @@ public class HintLabels {
 
     private Properties properties;
 
-    public HintLabels(String language) {
+    public HintLabels(Language language) {
         String fileName = language + "/Hints.properties";
         try {
             this.properties = FileIO.loadProperties(fileName);

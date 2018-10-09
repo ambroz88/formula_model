@@ -5,6 +5,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ambroz.formula.gamemodel.enums.Language;
 import com.ambroz.formula.gamemodel.utils.FileIO;
 
 /**
@@ -18,7 +19,7 @@ public class StartMenuLabels {
 
     private Properties properties;
 
-    public StartMenuLabels(String language) {
+    public StartMenuLabels(Language language) {
         String fileName = language + "/StartMenu.properties";
         try {
             this.properties = FileIO.loadProperties(fileName);

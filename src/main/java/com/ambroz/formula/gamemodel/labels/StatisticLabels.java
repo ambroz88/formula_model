@@ -5,6 +5,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ambroz.formula.gamemodel.enums.Language;
 import com.ambroz.formula.gamemodel.utils.FileIO;
 
 /**
@@ -19,7 +20,7 @@ public class StatisticLabels {
 
     private Properties properties;
 
-    public StatisticLabels(String language) {
+    public StatisticLabels(Language language) {
         String fileName = language + "/StatPanel.properties";
         try {
             this.properties = FileIO.loadProperties(fileName);

@@ -5,6 +5,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ambroz.formula.gamemodel.enums.Language;
 import com.ambroz.formula.gamemodel.utils.FileIO;
 
 /**
@@ -29,7 +30,7 @@ public class OptionsLabels {
 
     private Properties properties;
 
-    public OptionsLabels(String language) {
+    public OptionsLabels(Language language) {
         String fileName = language + "/Options.properties";
         try {
             this.properties = FileIO.loadProperties(fileName);

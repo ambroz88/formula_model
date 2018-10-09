@@ -5,6 +5,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ambroz.formula.gamemodel.enums.Language;
 import com.ambroz.formula.gamemodel.utils.FileIO;
 
 /**
@@ -22,7 +23,7 @@ public final class DialogLabels {
 
     private Properties properties;
 
-    public DialogLabels(String language) {
+    public DialogLabels(Language language) {
         String fileName = language + "/Dialog.properties";
         try {
             this.properties = FileIO.loadProperties(fileName);

@@ -21,7 +21,7 @@ public class CoreModel extends PropertyChanger {
         this.paper = gamePaper;
         track = new Track();
         language = Language.English;
-        hintLabels = new HintLabels(language.toString());
+        hintLabels = new HintLabels(language);
     }
 
     public void repaintScene() {
@@ -46,8 +46,8 @@ public class CoreModel extends PropertyChanger {
     public final void setLanguage(Language language) {
         String old = getLanguage().toString();
         this.language = language;
-        hintLabels = new HintLabels(language.toString());
-        firePropertyChange(LANGUAGE, old, language.toString());
+        hintLabels = new HintLabels(language);
+        firePropertyChange(LANGUAGE, old, language);
     }
 
     public int getStage() {

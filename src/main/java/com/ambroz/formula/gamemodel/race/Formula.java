@@ -33,6 +33,8 @@ public class Formula extends Polyline {
         moves = 0; //numbers of turns of this formula
         length = 0;
         wait = 0;
+        rgbColor = 0;
+        name = "";
         type = formulaType;
     }
 

@@ -8,7 +8,6 @@ import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.enums.Language;
 import com.ambroz.formula.gamemodel.race.RaceModel;
 import com.ambroz.formula.gamemodel.utils.TrackIO;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -65,6 +64,7 @@ public class StartTest {
 
     private void assertSituation(String trackName, List<Point> clicks) {
         model.prepareGame(TrackIO.trackFromJSON(trackName));
+        model.startGame();
 
         for (Point p : clicks) {
             model.moveWithPlayer(p);

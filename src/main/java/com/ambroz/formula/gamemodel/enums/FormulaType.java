@@ -8,7 +8,10 @@ import com.ambroz.formula.gamemodel.labels.PrepareGameLabels;
  */
 public enum FormulaType {
 
-    Player(PrepareGameLabels.PLAYER), ComputerEasy(PrepareGameLabels.COMPUTER_EASY), ComputerMedium(PrepareGameLabels.COMPUTER_MEDIUM);
+    Player(PrepareGameLabels.PLAYER),
+    ComputerEasy(PrepareGameLabels.COMPUTER_EASY),
+    ComputerMedium(PrepareGameLabels.COMPUTER_MEDIUM),
+    None(PrepareGameLabels.NONE);
 
     private final String type;
 
@@ -18,14 +21,14 @@ public enum FormulaType {
 
     public static FormulaType getType(int formuleType) {
         FormulaType formula;
-        if (formuleType == 0) {
+        if (formuleType == 1) {
             formula = Player;
-        } else if (formuleType == 1) {
-            formula = ComputerEasy;
         } else if (formuleType == 2) {
+            formula = ComputerEasy;
+        } else if (formuleType == 3) {
             formula = ComputerMedium;
         } else {
-            formula = null;
+            formula = None;
         }
         return formula;
     }

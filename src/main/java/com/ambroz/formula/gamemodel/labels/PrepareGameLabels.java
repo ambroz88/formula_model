@@ -17,6 +17,7 @@ public class PrepareGameLabels {
     public final static String PLAYER = "player";
     public final static String COMPUTER_EASY = "computerEasy";
     public final static String COMPUTER_MEDIUM = "computerMedium";
+    public final static String NONE = "none";
     public final static String START_GAME = "startGame";
 
     private Properties properties;

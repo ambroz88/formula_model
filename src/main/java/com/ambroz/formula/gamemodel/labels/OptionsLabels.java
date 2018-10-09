@@ -25,7 +25,6 @@ public class OptionsLabels {
     public final static String RULE_SECOND = "rule_second";
     public final static String RULE_COLISION = "rule_colision";
     public final static String PLAYERS = "players";
-    public final static String PLAYER = "player";
     public final static String SHOW_TURNS = "show_turns";
 
     private Properties properties;

@@ -31,8 +31,9 @@ public class TurnMaker extends RaceOptions {
         formulaID = 1;
         racers = new HashMap<>();
         Formula alfred = new Formula(FormulaType.Player);
-        alfred.setName("Alfred");
-        racers.put(formulaID, alfred);
+        racers.put(1, alfred);
+//        Formula christina = new Formula(FormulaType.None);
+//        racers.put(2, christina);
 
         turns = new Turns();
     }

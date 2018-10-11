@@ -7,7 +7,6 @@ import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.race.RaceModel;
 import com.ambroz.formula.gamemodel.utils.TrackIO;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +34,10 @@ public class CrashTest {
         clicks.add(new Point(22, 15));
         clicks.add(new Point(27, 13));
         clicks.add(new Point(31, 12));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
         clicks.add(new Point(28, 14));
         clicks.add(new Point(29, 16));
         clicks.add(new Point(29, 19));
@@ -48,16 +51,27 @@ public class CrashTest {
         clicks.add(new Point(41, 23));
         clicks.add(new Point(42, 19));
         clicks.add(new Point(44, 14));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
         clicks.add(new Point(41, 17));
         clicks.add(new Point(39, 16));
         clicks.add(new Point(36, 14));
         clicks.add(new Point(32, 13));
         clicks.add(new Point(27, 11));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
         clicks.add(new Point(31, 11));
         clicks.add(new Point(32, 9));
 
         String trackName = "Curved";
-        assertSituation(trackName, clicks);
+        runTurns(trackName, clicks);
+        Assert.assertEquals(model.getTurnMaker().getActiveFormula().getLast(), clicks.get(clicks.size() - 1));
     }
 
     @Test
@@ -70,11 +84,17 @@ public class CrashTest {
         clicks.add(new Point(47, 40));
         clicks.add(new Point(46, 34));
         clicks.add(new Point(44, 29));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
         clicks.add(new Point(47, 32));
 
         String trackName = "Snail";
 
-        assertSituation(trackName, clicks);
+        runTurns(trackName, clicks);
+        Assert.assertEquals(model.getTurnMaker().getActiveFormula().getLast(), clicks.get(clicks.size() - 1));
     }
 
     @Test
@@ -106,8 +126,9 @@ public class CrashTest {
 
         String trackName = "Circuit";
 
-        assertSituation(trackName, clicks);
+        runTurns(trackName, clicks);
         Assert.assertTrue(model.getStage() == RaceModel.GAME_OVER);
+        Assert.assertTrue(new Point(13, 21).isEqual(model.getTurnMaker().getActiveFormula().getLast()));
     }
 
     @Test
@@ -134,18 +155,17 @@ public class CrashTest {
 
         String trackName = "Test Finish";
 
-        assertSituation(trackName, clicks);
+        runTurns(trackName, clicks);
         Assert.assertTrue(model.getStage() == RaceModel.GAME_OVER);
+        Assert.assertTrue(new Point(54, 44).isEqual(model.getTurnMaker().getActiveFormula().getLast()));
     }
 
-    private void assertSituation(String trackName, List<Point> clicks) {
+    private void runTurns(String trackName, List<Point> clicks) {
         model.prepareGame(TrackIO.trackFromJSON(trackName));
         model.startGame();
 
         for (Point p : clicks) {
             model.moveWithPlayer(p);
         }
-
-        Assert.assertEquals(model.getTurnMaker().getActiveFormula().getLast(), clicks.get(clicks.size() - 1));
     }
 }

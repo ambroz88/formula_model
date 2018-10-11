@@ -32,6 +32,10 @@ public class RaceModel extends CoreModel {
 
             if (getStage() == FIRST_TURN) {
                 turnMaker.firstTurn(click);
+            } else if (getStage() == AUTO_FINISH) {
+                turnMaker.runAutomaticFinishTurn();
+            } else if (getStage() == AUTO_CRASH) {
+                turnMaker.runAutomaticCrashTurn();
             } else if (getStage() > FIRST_TURN) {
                 turnMaker.turn(click);
             }
@@ -43,7 +47,7 @@ public class RaceModel extends CoreModel {
         }
     }
 
-    private void checkWinner() {
+    public void checkWinner() {
         if (turnMaker.getActiveFormula().getWin() == true) {
             winnerAnnouncement();
         }

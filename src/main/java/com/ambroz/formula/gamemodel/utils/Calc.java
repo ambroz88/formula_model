@@ -207,7 +207,7 @@ public abstract class Calc {
      * @param data is list of points where is searched the closest one
      * @return the nearest point in the list
      */
-    public static Point findNearestTurn(Point sourcePoint, List<Turn> data) {
+    public static Turn findNearestTurn(Point sourcePoint, List<Turn> data) {
         int minIndex = 0;
         for (int i = 1; i < data.size(); i++) {
             if (distance(sourcePoint, data.get(minIndex)) > distance(sourcePoint, data.get(i))) {
@@ -226,6 +226,24 @@ public abstract class Calc {
      * @return the nearest point in the list
      */
     public static int findNearestIndex(Point sourcePoint, List<Point> data) {
+        int minIndex = 0;
+        for (int i = 1; i < data.size(); i++) {
+            if (distance(sourcePoint, data.get(minIndex)) > distance(sourcePoint, data.get(i))) {
+                minIndex = i;
+            }
+        }
+        return minIndex;
+    }
+
+    /**
+     * This method finds position of the nearest point from the list of Points. The nearest one is calculated from the
+     * point 'sourcePoint'.
+     *
+     * @param sourcePoint is the point from which the distance is measure
+     * @param data is list of points where is searched the closest one
+     * @return the nearest point in the list
+     */
+    public static int findNearestTurnIndex(Point sourcePoint, List<Turn> data) {
         int minIndex = 0;
         for (int i = 1; i < data.size(); i++) {
             if (distance(sourcePoint, data.get(minIndex)) > distance(sourcePoint, data.get(i))) {

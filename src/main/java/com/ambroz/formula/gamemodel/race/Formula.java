@@ -66,7 +66,7 @@ public class Formula extends Polyline {
         }
     }
 
-    private void movesUp() {
+    public void movesUp() {
         movesUp(1);
     }
 
@@ -238,6 +238,10 @@ public class Formula extends Polyline {
         int old = getWait();
         this.wait = wait;
         firePropertyChange(FORMULA_WAIT, old, wait);
+    }
+
+    public void decreaseWait() {
+        setWait(getWait() - 1);
     }
 
     public int getWait() {

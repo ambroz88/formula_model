@@ -7,7 +7,6 @@ import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.race.RaceModel;
 import com.ambroz.formula.gamemodel.utils.TrackIO;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,8 +39,9 @@ public class FinishTest {
 
         String trackName = "Test";
 
-        assertSituation(trackName, clicks);
+        runTurns(trackName, clicks);
         Assert.assertTrue(model.getStage() == RaceModel.GAME_OVER);
+        Assert.assertTrue(model.getTurnMaker().getActiveFormula().getLast().isEqual(new Point(58, 19)));
     }
 
     @Test
@@ -60,18 +60,17 @@ public class FinishTest {
 
         String trackName = "Test";
 
-        assertSituation(trackName, clicks);
+        runTurns(trackName, clicks);
         Assert.assertTrue(model.getStage() == RaceModel.GAME_OVER);
+        Assert.assertTrue(model.getTurnMaker().getActiveFormula().getLast().isEqual(new Point(58, 19)));
     }
 
-    private void assertSituation(String trackName, List<Point> clicks) {
+    private void runTurns(String trackName, List<Point> clicks) {
         model.prepareGame(TrackIO.trackFromJSON(trackName));
         model.startGame();
 
         for (Point p : clicks) {
             model.moveWithPlayer(p);
         }
-
-        Assert.assertEquals(model.getTurnMaker().getActiveFormula().getLast(), clicks.get(clicks.size() - 1));
     }
 }

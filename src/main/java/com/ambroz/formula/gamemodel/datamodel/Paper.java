@@ -3,6 +3,8 @@ package com.ambroz.formula.gamemodel.datamodel;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ambroz.formula.gamemodel.race.Turn;
+
 /**
  *
  * @author Jiri Ambroz <ambroz88@seznam.cz>
@@ -93,10 +95,10 @@ public class Paper extends PropertyChanger {
     /**
      * It returns number of points, which are outside of the visible part of drawing window.
      *
-     * @param data is set of points that will be tested
+     * @param data is set of turns that will be tested
      * @return number of points outside of paper
      */
-    public int outPaperNumber(List<Point> data) {
+    public int outPaperNumber(List<Turn> data) {
         int outBorder = 0;
 
         for (int i = 0; i < data.size(); i++) {

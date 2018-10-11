@@ -10,6 +10,7 @@ import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.enums.FormulaType;
 import com.ambroz.formula.gamemodel.enums.PointPosition;
 import com.ambroz.formula.gamemodel.enums.Side;
+import com.ambroz.formula.gamemodel.labels.HintLabels;
 import com.ambroz.formula.gamemodel.track.Track;
 import com.ambroz.formula.gamemodel.utils.Calc;
 import com.ambroz.formula.gamemodel.utils.TurnCalculations;
@@ -54,17 +55,28 @@ public class TurnMaker extends RaceOptions {
 
     public void turn(Point click) {
         Turn selectedTurn = turns.containsTurn(click);
+        Formula act = getActiveFormula();
+
         if (selectedTurn != null) {
 
-            Formula act = getActiveFormula();
             if (selectedTurn.getCollision() == null || selectedTurn.getPosition().contains(PointPosition.Finish)) {
 
-                act.addPoint(click);
                 checkFinishTurn(selectedTurn, click);
+                if (!act.getWin()) {
+                    act.addPoint(click);
+                }
                 nextTurn(formulaID, act.getLast());
 
             } else {
                 handleCrashTurn(click, selectedTurn);
+            }
+        } else {
+            if (act.getWait() > 0) {
+                act.decreaseWait();
+                if (act.getWait() == 0) {
+                    getTurns().createCrashTurn(act.getLast());
+                    divideTurns(act.getLast());
+                }
             }
         }
     }
@@ -73,7 +85,7 @@ public class TurnMaker extends RaceOptions {
         if (selectedTurn.getPosition().contains(PointPosition.Finish)
                 && Side.Left == Calc.sidePosition(click, model.getTrack().getFinish())) {
             Formula act = getActiveFormula();
-            act.lengthUp(act.getPreLast(), selectedTurn.getCollision().getCollisionPoint());
+            act.addPoint(selectedTurn.getCollision().getCollisionPoint());
             act.setWin(true);
         }
     }
@@ -88,6 +100,8 @@ public class TurnMaker extends RaceOptions {
         Point center = racers.get(formOnTurn).calculateNextCenter();
         getTurns().createStandardTurn(center, getTurnsCount());
         divideTurns(rivalLast);
+
+        checkAutomaticTurn();
     }
 
     private void handleCrashTurn(Point click, Turn selectedTurn) {
@@ -95,17 +109,65 @@ public class TurnMaker extends RaceOptions {
         active.setCollision(selectedTurn.getCollision());
 
         int maxSpeed = active.maxSpeed(click);
-        active.setWait(maxSpeed + 1);
+        active.setWait(maxSpeed);
         active.movesUp(maxSpeed);
 
         active.addCollisionPoint();
 
         Point crashCenter = TurnCalculations.generateCrashCenter(active);
         active.addPoint(crashCenter);
-        getTurns().createCrashTurn(crashCenter);
+        getTurns().reset();
 
-        divideTurns(active.getLast());
         model.fireCrash(maxSpeed);
+    }
+
+    public void checkAutomaticTurn() {
+        //kontrola, jestli se mozne tahy nenachazeji mimo viditelnou oblast
+        int onPaperTurns = model.getPaper().outPaperNumber(getTurns().getFreeTurns());//pocet moznosti koncici za cilem
+        int outsideTurns = model.getPaper().outPaperNumber(getTurns().getCollisionTurns());//pocet moznosti koncici narazem
+
+        //vsechny moznosti druheho hrace jsou mimo viditelnou oblast:
+        // ----------------------- AUTOMATICKY TAH -------------------------
+        //pocet moznych tahu: 4,5,9
+        if ((outsideTurns == FOUR_TURNS && getTurnsCount() == FOUR_TURNS) || (outsideTurns == FIVE_TURNS && getTurnsCount() == FIVE_TURNS)
+                || (outsideTurns == NINE_TURNS && getTurnsCount() == NINE_TURNS)) {//vsechny moznosti zpusobi naraz
+            model.setStage(RaceModel.AUTO_CRASH);
+            model.fireHint(HintLabels.NEXT_CLOSE_TURN);
+        } else if (onPaperTurns > 0 && onPaperTurns == getTurns().getFreeTurns().size()) {
+            //zadna dobra moznost neni videt - tah na nejblizsi
+            model.setStage(RaceModel.AUTO_FINISH);
+            model.fireHint(HintLabels.NEXT_CLOSE_TURN);
+        }
+    }
+
+    /**
+     * All possible turns are outside of the paper and all are crash turns. It will choose the nearest turn.
+     */
+    public void runAutomaticCrashTurn() {
+        Formula act = getActiveFormula();
+        Turn collisionTurn = Calc.findNearestTurn(act.getLast(), getTurns().getCollisionTurns());
+        act.setCollision(collisionTurn.getCollision());
+
+        int maxSpeed = act.maxSpeed(collisionTurn);
+        act.setWait(maxSpeed);
+        model.fireCrash(maxSpeed);
+        act.movesUp(maxSpeed);
+        act.addCollisionPoint();
+
+        Point crashCenter = TurnCalculations.generateCrashCenter(act);
+        act.addPoint(crashCenter);
+        model.setStage(RaceModel.NORMAL_TURN);
+    }
+
+    /**
+     * All possible turns are outside of the paper but they are without collision. It is obvious that all turns are
+     * behind start line.
+     */
+    public void runAutomaticFinishTurn() {
+        Formula act = getActiveFormula();
+        act.addPoint(Calc.findNearestTurn(act.getLast(), getTurns().getFreeTurns()).getCollision().getCollisionPoint());
+        act.setWin(true);
+        model.checkWinner();
     }
 
     //-------------------------- DIVIDE TURNS methods -------------------------

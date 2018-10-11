@@ -15,7 +15,7 @@ import org.junit.Test;
  *
  * @author Jiri Ambroz <ambroz88@seznam.cz>
  */
-public class StartTest {
+public class AutomaticTurnsTest {
 
     private RaceModel model;
 
@@ -25,44 +25,25 @@ public class StartTest {
     }
 
     @Test
-    public void goThroughStart() {
+    public void automaticTurn() {
         List<Point> clicks = new ArrayList<>();
-        clicks.add(new Point(49, 55));
-        clicks.add(new Point(50, 52));
-        clicks.add(new Point(50, 51));
-        clicks.add(new Point(51, 51));
-        clicks.add(new Point(51, 52));
-        clicks.add(new Point(52, 54));
-        clicks.add(new Point(52, 55));
+        clicks.add(new Point(14, 23));
+        clicks.add(new Point(17, 22));
+        clicks.add(new Point(20, 20));
+        clicks.add(new Point(22, 17));
+        clicks.add(new Point(25, 15));
+        clicks.add(new Point(29, 12));
+        clicks.add(new Point(32, 8));
+        clicks.add(new Point(34, 3));
+        clicks.add(new Point(35, -1));
         clicks.add(new Point(1, 1));
         clicks.add(new Point(1, 1));
         clicks.add(new Point(1, 1));
-        clicks.add(new Point(52, 53));
-        clicks.add(new Point(53, 51));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(1, 1));
+        clicks.add(new Point(33, 3));
 
-        String trackName = "Snail";
-
-        assertSituation(trackName, clicks);
-    }
-
-    @Test
-    public void goThroughStartAndTrack() {
-        List<Point> clicks = new ArrayList<>();
-        clicks.add(new Point(49, 55));
-        clicks.add(new Point(50, 52));
-        clicks.add(new Point(50, 51));
-        clicks.add(new Point(51, 51));
-        clicks.add(new Point(51, 52));
-        clicks.add(new Point(52, 54));
-        clicks.add(new Point(52, 57));
-        clicks.add(new Point(1, 1));
-        clicks.add(new Point(1, 1));
-        clicks.add(new Point(1, 1));
-        clicks.add(new Point(1, 1));
-        clicks.add(new Point(52, 53));
-        clicks.add(new Point(53, 51));
-
-        String trackName = "Snail";
+        String trackName = "Circuit";
 
         assertSituation(trackName, clicks);
     }

@@ -82,11 +82,17 @@ public class TurnMaker extends RaceOptions {
     }
 
     private void checkFinishTurn(Turn selectedTurn, Point click) {
-        if (selectedTurn.getPosition().contains(PointPosition.Finish)
-                && Side.Left == Calc.sidePosition(click, model.getTrack().getFinish())) {
+        if (Side.Left == Calc.sidePosition(click, model.getTrack().getFinish())) {
             Formula act = getActiveFormula();
-            act.addPoint(selectedTurn.getCollision().getCollisionPoint());
-            act.setWin(true);
+
+            if (selectedTurn.getPosition().equals(PointPosition.Finish)) {
+                act.addPoint(selectedTurn.getCollision().getCollisionPoint());
+                act.setWin(true);
+            } else if (selectedTurn.getPosition().contains(PointPosition.FinishLine)) {
+                act.movesUp();
+                act.setWin(true);
+            }
+
         }
     }
 

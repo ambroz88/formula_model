@@ -1,10 +1,15 @@
 package com.ambroz.formula.gamemodel.race;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.ambroz.formula.gamemodel.datamodel.CoreModel;
 import com.ambroz.formula.gamemodel.datamodel.Paper;
 import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.labels.HintLabels;
 import com.ambroz.formula.gamemodel.track.Track;
+import com.ambroz.formula.gamemodel.utils.RaceResult;
 
 /**
  *
@@ -27,7 +32,7 @@ public class RaceModel extends CoreModel {
     }
 
     public void moveWithPlayer(Point click) {
-        if (!getPaper().isOutside(click)) {
+        if (!getPaper().isOutside(click) && getStage() != GAME_OVER) {
             fireHint(HintLabels.EMPTY);
 
             if (getStage() == FIRST_TURN) {
@@ -49,6 +54,12 @@ public class RaceModel extends CoreModel {
 
     public void checkWinner() {
         if (turnMaker.getActiveFormula().getWin() == true) {
+            getTrack().getBoard().addRecord(turnMaker.getActiveFormula());
+            try {
+                RaceResult.saveResult(getTrack().getBoard());
+            } catch (IOException ex) {
+                Logger.getLogger(RaceModel.class.getName()).log(Level.SEVERE, null, ex);
+            }
             winnerAnnouncement();
         }
     }

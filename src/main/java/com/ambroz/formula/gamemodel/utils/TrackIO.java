@@ -1,7 +1,6 @@
 package com.ambroz.formula.gamemodel.utils;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +12,6 @@ import com.ambroz.formula.gamemodel.datamodel.Point;
 import com.ambroz.formula.gamemodel.datamodel.Polyline;
 import com.ambroz.formula.gamemodel.enums.Side;
 import com.ambroz.formula.gamemodel.track.Track;
-
 import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -72,14 +70,7 @@ public abstract class TrackIO {
 
     private static void trackToFile(String name, JSONObject obj) throws JSONException, IOException {
         String filePath = getTrackFilePath(name + ".json");
-        try {
-            try (FileWriter file = new FileWriter(filePath)) {
-                file.write(obj.toString(4));
-                file.close();
-            }
-        } catch (IOException e) {
-            throw e;
-        }
+        FileIO.saveFile(obj.toString(4), filePath);
     }
 
     public static Track trackFromJSON(String name) {
@@ -99,7 +90,7 @@ public abstract class TrackIO {
             String height = jsonObject.get("height").toString();
 
             // load new track
-            Track track = new Track();
+            Track track = new Track(RaceResult.loadResults(name));
             track.setLeft(left);
             track.setRight(right);
 

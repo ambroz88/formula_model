@@ -20,6 +20,7 @@ public class Track {
 
     private Polyline left;
     private Polyline right;
+    private Scoreboard board;
     private int leftIndex;
     private int rightIndex;
     private int leftWidth;
@@ -38,6 +39,11 @@ public class Track {
         leftWidth = 3;
         rightWidth = 3;
         ready = false;
+    }
+
+    public Track(Scoreboard scoreBoard) {
+        this();
+        this.board = scoreBoard;
     }
 
     public Polyline getLine(Side side) {
@@ -385,6 +391,14 @@ public class Track {
         rightIndex = 0;
         maxWidth = 0;
         maxHeight = 0;
+    }
+
+    public Scoreboard getBoard() {
+        return board;
+    }
+
+    public void setBoard(Scoreboard board) {
+        this.board = board;
     }
 
     @Override

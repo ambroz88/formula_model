@@ -7,7 +7,6 @@ import com.ambroz.formula.gamemodel.datamodel.Segment;
 import com.ambroz.formula.gamemodel.enums.PointPosition;
 import com.ambroz.formula.gamemodel.enums.Side;
 import com.ambroz.formula.gamemodel.race.Formula;
-import com.ambroz.formula.gamemodel.utils.Calc;
 
 /**
  *

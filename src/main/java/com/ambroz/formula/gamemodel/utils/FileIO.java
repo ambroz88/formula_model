@@ -1,6 +1,8 @@
 package com.ambroz.formula.gamemodel.utils;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -20,11 +22,21 @@ public abstract class FileIO {
     }
 
     public static String readFileToString(String filePath) throws IOException {
-        return FileUtils.readFileToString(FileUtils.getFile(filePath), "UTF-8");
+        return readFileToString(FileUtils.getFile(filePath));
+    }
+
+    public static String readFileToString(File filePath) throws IOException {
+        return FileUtils.readFileToString(filePath, "UTF-8");
     }
 
     public static String getResourceFilePath(String path) {
         return FileIO.class.getClassLoader().getResource(path).getFile();
     }
 
+    public static void saveFile(String content, String filePath) throws IOException {
+        try (FileWriter file = new FileWriter(filePath)) {
+            file.write(content);
+            file.close();
+        }
+    }
 }

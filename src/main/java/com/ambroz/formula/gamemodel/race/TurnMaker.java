@@ -173,7 +173,6 @@ public class TurnMaker extends RaceOptions {
         Formula act = getActiveFormula();
         act.addPoint(Calc.findNearestTurn(act.getLast(), getTurns().getFreeTurns()).getCollision().getCollisionPoint());
         act.setWin(true);
-        model.checkWinner();
     }
 
     //-------------------------- DIVIDE TURNS methods -------------------------
